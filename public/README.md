@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# jojosdtadmin
-=======
 # 🎮 HaxBall DreamTeam - Admin Panel para Vercel
 
 ## 📋 Passo a Passo para Deploy
@@ -130,4 +127,3 @@ CREATE TABLE emoji_codes (
 ---
 
 **🎯 Tudo pronto para controlar o bot pelo Vercel de forma completa e profissional!**
->>>>>>> 7af5a53 (Sua mensagem de commit aqui)
