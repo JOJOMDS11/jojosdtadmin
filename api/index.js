@@ -1,33 +1,49 @@
 const mysql = require('mysql2/promise');
 
-// Configuração do banco
+// Configuração do banco principal (jojodreamteam)
 async function createConnection() {
-    return await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        port: process.env.DB_PORT || 3306,
-        ssl: {
-            rejectUnauthorized: false
-        },
-        connectTimeout: 30000
-    });
+    try {
+        console.log('Conectando ao banco principal:', process.env.DB_NAME || 'jojodreamteam');
+        return await mysql.createConnection({
+            host: process.env.DB_HOST || 'jojodreamteam.cgv8aga22uxg.us-east-1.rds.amazonaws.com',
+            user: process.env.DB_USER || 'admin',
+            password: process.env.DB_PASSWORD || 'soufoda123',
+            database: process.env.DB_NAME || 'jojodreamteam',
+            port: process.env.DB_PORT || 3306,
+            ssl: {
+                rejectUnauthorized: false
+            },
+            connectTimeout: 60000,
+            acquireTimeout: 60000,
+            timeout: 60000
+        });
+    } catch (error) {
+        console.error('Erro ao conectar banco principal:', error);
+        throw error;
+    }
 }
 
-// Configuração do banco PIX (para códigos)
+// Configuração do banco PIX (jojopix)
 async function createPixConnection() {
-    return await mysql.createConnection({
-        host: process.env.DB_HOST || 'jojodreamteam.cgv8aga22uxg.us-east-1.rds.amazonaws.com',
-        user: process.env.DB_USER || 'admin',
-        password: process.env.DB_PASSWORD,
-        database: 'jojopix', // Banco específico para códigos PIX
-        port: process.env.DB_PORT || 3306,
-        ssl: {
-            rejectUnauthorized: false
-        },
-        connectTimeout: 30000
-    });
+    try {
+        console.log('Conectando ao banco PIX:', process.env.DB_NAME_PIX || 'jojopix');
+        return await mysql.createConnection({
+            host: process.env.DB_HOST || 'jojodreamteam.cgv8aga22uxg.us-east-1.rds.amazonaws.com',
+            user: process.env.DB_USER || 'admin',
+            password: process.env.DB_PASSWORD || 'soufoda123',
+            database: process.env.DB_NAME_PIX || 'jojopix',
+            port: process.env.DB_PORT || 3306,
+            ssl: {
+                rejectUnauthorized: false
+            },
+            connectTimeout: 60000,
+            acquireTimeout: 60000,
+            timeout: 60000
+        });
+    } catch (error) {
+        console.error('Erro ao conectar banco PIX:', error);
+        throw error;
+    }
 }
 
 // Função para converter emoji para hex
@@ -86,7 +102,16 @@ export default async function handler(req, res) {
         }
 
         // Conectar ao banco principal
-        connection = await createConnection();
+        try {
+            connection = await createConnection();
+        } catch (error) {
+            console.error('Falha na conexão com banco principal:', error);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro de conexão com banco de dados principal',
+                error: error.message 
+            });
+        }
 
         // ROTA: STATS
         if (url === '/stats') {
@@ -228,7 +253,16 @@ export default async function handler(req, res) {
         // ROTA: CODES (usando banco PIX)
         if (url.startsWith('/codes')) {
             await connection.end();
-            connection = await createPixConnection();
+            try {
+                connection = await createPixConnection();
+            } catch (error) {
+                console.error('Falha na conexão com banco PIX:', error);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro de conexão com banco PIX',
+                    error: error.message 
+                });
+            }
             
             if (req.method === 'GET') {
                 const [codes] = await connection.execute('SELECT * FROM purple_coin_codes ORDER BY created_at DESC');
@@ -264,8 +298,19 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('Erro no handler unificado:', error);
-        return res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Erro interno do servidor',
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     } finally {
-        if (connection) await connection.end();
+        if (connection) {
+            try {
+                await connection.end();
+            } catch (error) {
+                console.error('Erro ao fechar conexão:', error);
+            }
+        }
     }
 }
