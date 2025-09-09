@@ -350,6 +350,10 @@
                         <p>⚙️ Templates</p>
                     </div>
                     <div class="stat-card">
+                        <h3 id="totalTournaments">-</h3>
+                        <p>🏆 Torneios</p>
+                    </div>
+                    <div class="stat-card">
                         <h3 id="totalPurpleCoins">-</h3>
                         <p>💰 Purple Coins em Circulação</p>
                     </div>
@@ -693,6 +697,7 @@
                     document.getElementById('totalTeams').textContent = data.data.totalTeams;
                     document.getElementById('totalCards').textContent = data.data.totalCards;
                     document.getElementById('totalTemplates').textContent = data.data.totalTemplates;
+                    document.getElementById('totalTournaments').textContent = data.data.totalTournaments || 0;
                     document.getElementById('totalPurpleCoins').textContent = data.data.totalPurpleCoins;
                 }
             } catch (error) {

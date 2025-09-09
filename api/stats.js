@@ -31,6 +31,14 @@ export default async function handler(req, res) {
             console.log('Tabela player_templates não existe');
         }
 
+        // Tentar buscar torneios (pode não existir)
+        let tournamentsCount = [{ total: 0 }];
+        try {
+            [tournamentsCount] = await connection.execute('SELECT COUNT(*) as total FROM tournaments');
+        } catch (error) {
+            console.log('Tabela tournaments não existe');
+        }
+
         // Buscar total de purple coins
         const [coinsSum] = await connection.execute('SELECT SUM(purple_coins) as total FROM players');
 
@@ -41,6 +49,7 @@ export default async function handler(req, res) {
                 totalTeams: teamsCount[0].total,
                 totalCards: cardsCount[0].total,
                 totalTemplates: templatesCount[0].total,
+                totalTournaments: tournamentsCount[0].total,
                 totalPurpleCoins: coinsSum[0].total || 0
             }
         });
