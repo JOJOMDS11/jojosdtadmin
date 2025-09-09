@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'haxball_dreamteam',
+    host: process.env.DB_HOST || 'jojodreamteam.cgv8aga22uxg.us-east-1.rds.amazonaws.com',
+    user: process.env.DB_USER || 'admin',
+    password: process.env.DB_PASSWORD || 'soufoda123',
+    database: process.env.DB_NAME || 'jojodb',
     port: process.env.DB_PORT || 3306
 };
 
@@ -45,13 +45,13 @@ export default async function handler(req, res) {
                     tournament: rows[0]
                 });
             } else {
-                // Buscar todos os torneios com contagem de times
+                // Buscar todos os torneios
                 const [rows] = await connection.execute(`
                     SELECT 
                         t.*,
-                        COUNT(tt.team_id) as registered_teams
+                        COUNT(tr.id) as registered_teams
                     FROM tournaments t
-                    LEFT JOIN tournament_teams tt ON t.id = tt.tournament_id
+                    LEFT JOIN tournament_registrations tr ON t.id = tr.tournament_id
                     GROUP BY t.id
                     ORDER BY t.created_at DESC
                 `);
@@ -64,55 +64,35 @@ export default async function handler(req, res) {
         }
 
         if (req.method === 'POST') {
-            const { name, max_teams, prize_purple_coins, description } = req.body;
+            const { 
+                name, 
+                date, 
+                time, 
+                format = '3v3', 
+                max_players = 6,
+                prize_1st = '100 Purple Coins',
+                prize_2nd = '50 Purple Coins',
+                prize_3rd = '25 Purple Coins'
+            } = req.body;
 
-            if (!name || !max_teams) {
+            if (!name || !date || !time) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Nome e número máximo de times são obrigatórios'
+                    message: 'Nome, data e horário são obrigatórios'
                 });
             }
 
-            const [result] = await connection.execute(
-                `INSERT INTO tournaments (name, max_teams, prize_purple_coins, description, status, created_at) 
-                 VALUES (?, ?, ?, ?, 'ATIVO', NOW())`,
-                [name, max_teams, prize_purple_coins || 0, description || '']
-            );
+            const [result] = await connection.execute(`
+                INSERT INTO tournaments (
+                    name, date, time, format, max_players, 
+                    prize_1st, prize_2nd, prize_3rd, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'upcoming')
+            `, [name, date, time, format, max_players, prize_1st, prize_2nd, prize_3rd]);
 
             return res.json({
                 success: true,
                 message: 'Torneio criado com sucesso!',
                 tournament_id: result.insertId
-            });
-        }
-
-        if (req.method === 'PUT') {
-            // Atualizar status do torneio
-            const { id, status } = req.body;
-
-            if (!id || !status) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'ID e status são obrigatórios'
-                });
-            }
-
-            const validStatuses = ['ATIVO', 'EM_ANDAMENTO', 'FINALIZADO', 'CANCELADO'];
-            if (!validStatuses.includes(status)) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Status inválido'
-                });
-            }
-
-            await connection.execute(
-                `UPDATE tournaments SET status = ?, updated_at = NOW() WHERE id = ?`,
-                [status, id]
-            );
-
-            return res.json({
-                success: true,
-                message: `Status do torneio atualizado para ${status}`
             });
         }
 
@@ -126,34 +106,11 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Verificar se existe torneio
-            const [existing] = await connection.execute(
-                'SELECT id FROM tournaments WHERE id = ?',
-                [id]
-            );
-
-            if (existing.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Torneio não encontrado'
-                });
-            }
-
-            // Remover times inscritos primeiro
-            await connection.execute(
-                'DELETE FROM tournament_teams WHERE tournament_id = ?',
-                [id]
-            );
-
-            // Remover torneio
-            await connection.execute(
-                'DELETE FROM tournaments WHERE id = ?',
-                [id]
-            );
+            await connection.execute(`DELETE FROM tournaments WHERE id = ?`, [id]);
 
             return res.json({
                 success: true,
-                message: 'Torneio excluído com sucesso'
+                message: 'Torneio excluído com sucesso!'
             });
         }
 

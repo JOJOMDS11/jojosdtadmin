@@ -23,10 +23,10 @@ export default async function handler(req, res) {
                     ORDER BY created_at DESC 
                     LIMIT 50
                 `);
-                return res.status(200).json(rows);
+                return res.status(200).json({ success: true, data: rows });
             } catch (error) {
                 console.log('Tabela player_templates não existe');
-                return res.status(200).json([]);
+                return res.status(200).json({ success: true, data: [] });
             }
             
         } else if (req.method === 'POST') {

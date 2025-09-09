@@ -19,32 +19,29 @@ export default async function handler(req, res) {
             
             let query = `
                 SELECT 
-                    discord_id,
-                    username,
-                    purple_coins,
-                    total_cards,
-                    wins,
-                    losses,
-                    goals_scored,
-                    goals_conceded,
-                    assists,
-                    saves,
-                    created_at
-                FROM players
+                    p.discord_id,
+                    p.username as name,
+                    p.purple_coins,
+                    COUNT(pc.card_id) as card_count,
+                    t.name as team_name,
+                    p.created_at
+                FROM players p
+                LEFT JOIN player_cards pc ON p.discord_id = pc.discord_id
+                LEFT JOIN teams t ON p.discord_id = t.leader_id
             `;
             
             let params = [];
             
             if (search) {
-                query += ' WHERE discord_id LIKE ? OR username LIKE ?';
+                query += ' WHERE p.discord_id LIKE ? OR p.username LIKE ?';
                 params = [`%${search}%`, `%${search}%`];
             }
             
-            query += ' ORDER BY purple_coins DESC LIMIT 100';
+            query += ' GROUP BY p.discord_id ORDER BY p.purple_coins DESC LIMIT 100';
             
             const [rows] = await connection.execute(query, params);
             
-            return res.status(200).json(rows);
+            return res.status(200).json({ success: true, data: rows });
             
         } else if (req.method === 'POST') {
             const { discord_id, purple_coins } = req.body;
