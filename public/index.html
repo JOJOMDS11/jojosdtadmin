@@ -459,6 +459,40 @@
             <div class="tab-content" id="coins">
                 <h3>💰 Gerenciar Purple Coins</h3>
 
+                <!-- Gerar Códigos Purple Coins -->
+                <div class="card">
+                    <h4>🎫 Gerar Código Purple Coins</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label for="codeAmount">Valor do Código:</label>
+                            <input type="number" id="codeAmount" placeholder="500" min="1" max="10000">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeExpires">Expira em (horas):</label>
+                            <input type="number" id="codeExpires" placeholder="24" min="1" max="8760" value="24">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeUses">Máximo de Usos:</label>
+                            <input type="number" id="codeUses" placeholder="1" min="1" max="1000" value="1">
+                        </div>
+                        <button class="btn" onclick="generateCode()">🎫 Gerar Código</button>
+                    </div>
+                    <div id="generatedCodeResult"></div>
+                </div>
+
+                <!-- Verificar Código -->
+                <div class="card">
+                    <h4>🔍 Verificar Código</h4>
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label for="checkCodeInput">Código:</label>
+                            <input type="text" id="checkCodeInput" placeholder="PC500_XXXXXXXX">
+                        </div>
+                        <button class="btn btn-secondary" onclick="checkCode()">Verificar</button>
+                    </div>
+                    <div id="codeCheckResult"></div>
+                </div>
+
                 <!-- Adicionar Moedas -->
                 <div class="card">
                     <h4>➕ Adicionar Purple Coins</h4>
@@ -988,6 +1022,135 @@
         }
 
         // Add Coins
+        function generateCode() {
+            const amount = parseInt(document.getElementById('codeAmount').value);
+            const expires = parseInt(document.getElementById('codeExpires').value);
+            const maxUses = parseInt(document.getElementById('codeUses').value);
+
+            if (!amount || !expires || !maxUses) {
+                showStatus('Preencha todos os campos para gerar o código!', 'error');
+                return;
+            }
+
+            if (amount < 1 || amount > 10000) {
+                showStatus('Valor deve estar entre 1 e 10,000 Purple Coins!', 'error');
+                return;
+            }
+
+            showStatus('Gerando código...', 'info');
+
+            fetch('/api/codes/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    amount: amount,
+                    expiresInHours: expires,
+                    maxUses: maxUses
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const resultDiv = document.getElementById('generatedCodeResult');
+                    resultDiv.innerHTML = `
+                        <div style="background: #e8f5e8; border: 2px solid #4caf50; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                            <h4 style="color: #2e7d32; margin-bottom: 10px;">🎉 Código Gerado com Sucesso!</h4>
+                            <div style="background: #fff; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 18px; font-weight: bold; color: #1976d2; text-align: center; margin: 10px 0;">
+                                ${data.code}
+                            </div>
+                            <p><strong>💰 Valor:</strong> ${data.amount} Purple Coins</p>
+                            <p><strong>📊 Usos:</strong> 0/${data.maxUses}</p>
+                            <p><strong>⏰ Expira em:</strong> ${new Date(data.expiresAt).toLocaleString('pt-BR')}</p>
+                            <button class="btn btn-secondary" onclick="copyToClipboard('${data.code}')" style="margin-top: 10px;">📋 Copiar Código</button>
+                        </div>
+                    `;
+                    
+                    // Limpar campos
+                    document.getElementById('codeAmount').value = '';
+                    document.getElementById('codeExpires').value = '24';
+                    document.getElementById('codeUses').value = '1';
+                    
+                    showStatus('Código gerado com sucesso!');
+                } else {
+                    showStatus(data.error || 'Erro ao gerar código', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showStatus('Erro ao conectar com o servidor', 'error');
+            });
+        }
+
+        function checkCode() {
+            const code = document.getElementById('checkCodeInput').value.trim().toUpperCase();
+
+            if (!code) {
+                showStatus('Digite um código para verificar!', 'error');
+                return;
+            }
+
+            showStatus('Verificando código...', 'info');
+
+            fetch(`/api/codes/check/${code}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('codeCheckResult');
+                
+                if (data.success && data.code) {
+                    const codeInfo = data.code;
+                    const isExpired = new Date() > new Date(codeInfo.expires_at);
+                    const isUsedUp = codeInfo.remaining_uses <= 0;
+                    
+                    let statusColor = '#4caf50';
+                    let statusText = '✅ Válido';
+                    
+                    if (isExpired) {
+                        statusColor = '#f44336';
+                        statusText = '⏰ Expirado';
+                    } else if (isUsedUp) {
+                        statusColor = '#ff9800';
+                        statusText = '🚫 Esgotado';
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <div style="background: #f5f5f5; border: 2px solid ${statusColor}; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                            <h4 style="color: ${statusColor}; margin-bottom: 10px;">${statusText}</h4>
+                            <div style="background: #fff; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 16px; font-weight: bold; color: #1976d2; margin: 10px 0;">
+                                ${codeInfo.code}
+                            </div>
+                            <p><strong>💰 Valor:</strong> ${codeInfo.amount || codeInfo.purple_coins_value} Purple Coins</p>
+                            <p><strong>📊 Usos:</strong> ${(codeInfo.max_uses - codeInfo.remaining_uses) || 0}/${codeInfo.max_uses || 1}</p>
+                            <p><strong>⏰ Criado em:</strong> ${new Date(codeInfo.created_at).toLocaleString('pt-BR')}</p>
+                            <p><strong>🗓️ Expira em:</strong> ${new Date(codeInfo.expires_at).toLocaleString('pt-BR')}</p>
+                            ${codeInfo.description ? `<p><strong>📝 Descrição:</strong> ${codeInfo.description}</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: #ffeaa7; border: 2px solid #fdcb6e; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                            <h4 style="color: #e17055; margin-bottom: 10px;">❌ Código Não Encontrado</h4>
+                            <p>O código <strong>${code}</strong> não existe no sistema.</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('checkCodeInput').value = '';
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showStatus('Erro ao verificar código', 'error');
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('Código copiado para a área de transferência!');
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                showStatus('Erro ao copiar código', 'error');
+            });
+        }
+
         function addCoins() {
             const discordId = document.getElementById('coinDiscordId').value;
             const amount = parseInt(document.getElementById('coinAmount').value);
