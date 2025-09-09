@@ -656,7 +656,7 @@
         }
         // Load Codes
         function loadCodes() {
-            fetch('/api/admin.js/codes')
+            fetch('/api/codes')
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('codesTable');
@@ -695,7 +695,7 @@
         // Delete Code
         function deleteCode(code) {
             if (!confirm('Tem certeza que deseja excluir este código?')) return;
-            fetch(`/api/admin.js/codes/${code}`, { method: 'DELETE' })
+            fetch(`/api/codes/${code}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -717,7 +717,7 @@
 
         // Load Statistics
         function loadStats() {
-            fetch('/api/admin.js/stats')
+            fetch('/api/stats')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -786,7 +786,7 @@
 
         // Load Teams
         function loadTeams() {
-            fetch('/api/admin.js/teams')
+            fetch('/api/teams')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -817,7 +817,7 @@
 
         // Load Players
         function loadPlayers() {
-            fetch('/api/admin.js/players')
+            fetch('/api/players')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -849,7 +849,7 @@
 
         // Load Templates
         function loadTemplates() {
-            fetch('/api/admin.js/templates')
+            fetch('/api/templates')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -892,7 +892,7 @@
                 return;
             }
 
-            fetch('/api/admin.js/templates', {
+            fetch('/api/templates', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, position, avatar })
@@ -923,7 +923,7 @@
                 return;
             }
 
-            fetch(`/api/admin.js/teams/search?name=${encodeURIComponent(teamName)}`)
+            fetch(`/api/teams/search?name=${encodeURIComponent(teamName)}`)
                 .then(response => response.json())
                 .then(data => {
                     const resultDiv = document.getElementById('teamSearchResult');
@@ -952,7 +952,7 @@
 
         // Load Player Cards
         function loadPlayerCards(discordId) {
-            fetch(`/api/admin.js/user/${discordId}`)
+            fetch(`/api/user/${discordId}`)
                 .then(response => response.json())
                 .then(data => {
                     const resultDiv = document.getElementById('teamSearchResult');
@@ -987,7 +987,7 @@
 
         // Load All Teams
         function loadAllTeams() {
-            fetch('/api/admin.js/teams')
+            fetch('/api/teams')
                 .then(response => response.json())
                 .then(data => {
                     const resultDiv = document.getElementById('allTeamsList');
@@ -1031,7 +1031,7 @@
         function deleteTemplate(id) {
             if (!confirm('Tem certeza que deseja excluir este jogador?')) return;
 
-            fetch(`/api/admin.js/templates/${id}`, { method: 'DELETE' })
+            fetch(`/api/templates/${id}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1048,7 +1048,7 @@
         function deleteTeam(id) {
             if (!confirm('Tem certeza que deseja excluir este time?')) return;
 
-            fetch(`/api/admin.js/teams/${id}`, { method: 'DELETE' })
+            fetch(`/api/teams/${id}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1071,7 +1071,7 @@
                 return;
             }
 
-            fetch('/api/admin.js/coins', {
+            fetch('/api/coins', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ discordId, amount })
@@ -1098,7 +1098,7 @@
                 return;
             }
 
-            fetch(`/api/admin.js/user/${discordId}`)
+            fetch(`/api/user/${discordId}`)
                 .then(response => response.json())
                 .then(data => {
                     const resultDiv = document.getElementById('userSearchResult');
@@ -1123,7 +1123,7 @@
             const amount = prompt('Quantas Purple Coins adicionar?');
             if (!amount || isNaN(amount)) return;
 
-            fetch('/api/admin.js/coins', {
+            fetch('/api/coins', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ discordId, amount: parseInt(amount) })
@@ -1141,7 +1141,7 @@
 
         // Tournament Functions
         function loadTournaments() {
-            fetch('/api/admin.js/tournaments')
+            fetch('/api/tournaments')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.tournaments) {
@@ -1191,7 +1191,7 @@
                 prize_3rd: document.getElementById('tournamentPrize3rd').value
             };
 
-            fetch('/api/admin.js/tournaments', {
+            fetch('/api/tournaments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournamentData)
@@ -1215,7 +1215,7 @@
         // Delete Tournament
         function deleteTournament(id) {
             if (confirm('Tem certeza que deseja deletar este torneio?')) {
-                fetch(`/api/admin.js/tournaments/${id}`, {
+                fetch(`/api/tournaments/${id}`, {
                     method: 'DELETE'
                 })
                     .then(response => response.json())
@@ -1236,7 +1236,7 @@
 
         // View Tournament Registrations
         function viewTournamentRegistrations(tournamentId) {
-            fetch(`/api/admin.js/tournaments/${tournamentId}/registrations`)
+            fetch(`/api/tournaments/${tournamentId}/registrations`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1290,7 +1290,7 @@
                 prize_1st: prize1st, prize_2nd: prize2nd, prize_3rd: prize3rd
             };
 
-            fetch('/api/admin.js/tournaments', {
+            fetch('/api/tournaments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournamentData)
@@ -1318,7 +1318,7 @@
 
         // Load Tournaments
         function loadTournaments() {
-            fetch('/api/admin.js/tournaments')
+            fetch('/api/tournaments')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.tournaments) {
@@ -1358,7 +1358,7 @@
         // Start Tournament
         function startTournament(id) {
             if (confirm('Tem certeza que deseja iniciar este torneio?')) {
-                fetch(`/api/admin.js/tournaments/${id}/start`, {
+                fetch(`/api/tournaments/${id}/start`, {
                     method: 'POST'
                 })
                     .then(response => response.json())
@@ -1379,7 +1379,7 @@
         // Delete Tournament
         function deleteTournament(id) {
             if (confirm('Tem certeza que deseja deletar este torneio?')) {
-                fetch(`/api/admin.js/tournaments/${id}`, {
+                fetch(`/api/tournaments/${id}`, {
                     method: 'DELETE'
                 })
                     .then(response => response.json())
