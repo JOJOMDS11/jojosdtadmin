@@ -14,93 +14,44 @@ export default async function handler(req, res) {
     try {
         connection = await createConnection();
 
-        // Verificar se È rota de cÛdigos
-        if (req.url.includes('/generate-code')) {
-            if (req.method !== 'POST') {
-                return res.status(405).json({ success: false, message: 'MÈtodo n„o permitido' });
-            }
-
-            const { amount, max_uses } = req.body;
-
-            if (!amount || !max_uses || amount <= 0 || max_uses <= 0) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Quantidade e n˙mero m·ximo de usos s„o obrigatÛrios' 
-                });
-            }
-
-            // Gerar cÛdigo ˙nico
-            const code = generateUniqueCode();
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 30); // Expira em 30 dias
-
-            await connection.execute(
-                INSERT INTO purple_coin_codes (code, amount, max_uses, remaining_uses, expires_at, created_at)
-                VALUES (?, ?, ?, ?, ?, NOW())
-            , [code, amount, max_uses, max_uses, expiresAt]);
-
-            return res.status(200).json({
-                success: true,
-                code: code,
-                amount: amount,
-                max_uses: max_uses,
-                expires_at: expiresAt.toISOString()
-            });
-
-        } else if (req.url.includes('/codes')) {
+        // Rotas de c√≥digos dentro de coins
+        if (req.url.startsWith('/coins/codes')) {
             if (req.method === 'GET') {
-                // Listar cÛdigos ativos
-                const [codes] = await connection.execute(
-                    SELECT code, amount, max_uses, remaining_uses, expires_at, created_at
-                    FROM purple_coin_codes 
-                    WHERE remaining_uses > 0 AND expires_at > NOW()
-                    ORDER BY created_at DESC
-                );
-
-                return res.status(200).json({
-                    success: true,
-                    codes: codes
-                });
-
-            } else if (req.method === 'DELETE') {
-                // Deletar cÛdigo especÌfico - pegar cÛdigo da URL
-                const urlParts = req.url.split('/');
-                const code = urlParts[urlParts.length - 1];
-                
-                if (!code || code === 'codes') {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: 'CÛdigo n„o especificado' 
-                    });
-                }
-
-                const [result] = await connection.execute(
-                    'DELETE FROM purple_coin_codes WHERE code = ?',
-                    [code]
-                );
-
-                if (result.affectedRows > 0) {
-                    return res.status(200).json({
-                        success: true,
-                        message: 'CÛdigo deletado com sucesso'
-                    });
-                } else {
-                    return res.status(404).json({
-                        success: false,
-                        message: 'CÛdigo n„o encontrado'
-                    });
-                }
+                const [codes] = await connection.execute('SELECT * FROM purple_coin_codes ORDER BY created_at DESC');
+                return res.status(200).json({ success: true, codes });
             }
-        } else {
-            // Rota padr„o - adicionar coins diretamente
+            if (req.method === 'DELETE') {
+                const code = req.query.code || req.url.split('/').pop();
+                await connection.execute('DELETE FROM purple_coin_codes WHERE code = ?', [code]);
+                return res.status(200).json({ success: true, message: 'C√≥digo exclu√≠do com sucesso' });
+            }
+            if (req.method === 'POST') {
+                // Gerar novo c√≥digo
+                const { amount, max_uses } = req.body;
+                if (!amount || !max_uses || amount <= 0 || max_uses <= 0) {
+                    return res.status(400).json({ success: false, message: 'Quantidade e n√∫mero m√°ximo de usos s√£o obrigat√≥rios' });
+                }
+                const code = generateUniqueCode();
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + 30); // Expira em 30 dias
+                await connection.execute(
+                    'INSERT INTO purple_coin_codes (code, amount, max_uses, remaining_uses, expires_at, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
+                    [code, amount, max_uses, max_uses, expiresAt]
+                );
+                return res.status(200).json({ success: true, code, amount, max_uses, expires_at: expiresAt.toISOString() });
+            }
+        }
+        // Rota padr√£o - adicionar coins diretamente
+        if (req.url.startsWith('/coins')) {
+            // Rota padrÔøΩo - adicionar coins diretamente
             if (req.method !== 'POST') {
-                return res.status(405).json({ success: false, message: 'MÈtodo n„o permitido' });
+                return res.status(405).json({ success: false, message: 'MÔøΩtodo nÔøΩo permitido' });
             }
 
             const { discordId, amount } = req.body;
 
             if (!discordId || !amount || amount <= 0) {
-                return res.status(400).json({ success: false, message: 'Discord ID e quantidade s„o obrigatÛrios' });
+                return res.status(400).json({ success: false, message: 'Discord ID e quantidade sÔøΩo obrigatÔøΩrios' });
             }
 
             // Verificar se o jogador existe
@@ -110,7 +61,7 @@ export default async function handler(req, res) {
             );
 
             if (playerCheck.length === 0) {
-                return res.status(404).json({ success: false, message: 'Jogador n„o encontrado' });
+                return res.status(404).json({ success: false, message: 'Jogador nÔøΩo encontrado' });
             }
 
             // Adicionar coins
@@ -121,7 +72,7 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: ${amount} Purple Coins adicionadas ao jogador 
+                message: `${amount} Purple Coins adicionadas ao jogador`
             });
         }
 
