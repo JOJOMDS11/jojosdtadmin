@@ -2,8 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const mysql = require('mysql2/promise');
-const database = require('./api/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,63 +35,10 @@ app.post('/api/login', createHandler(async (req, res) => {
         return res.status(200).end();
     }
 
-    console.log('🔐 Tentativa de login...');
-    
-    // Primeiro testa a conexão com o banco
-    try {
-        const connectionTest = await database.testConnection();
-        if (!connectionTest) {
-            console.log('❌ Falha na conexão com banco de dados');
-            return res.status(500).json({ success: false, message: 'Erro de conexão com banco de dados!' });
-        }
-        console.log('✅ Conexão com banco OK');
-    } catch (error) {
-        console.error('❌ Erro ao testar conexão:', error);
-        return res.status(500).json({ success: false, message: 'Erro de conexão!' });
-    }
-
     if (password === (process.env.ADMIN_PASSWORD || 'admin123')) {
-        console.log('✅ Login bem-sucedido!');
         return res.status(200).json({ success: true });
     } else {
-        console.log('❌ Senha incorreta');
-        return res.status(401).json({ success: false, message: 'Senha incorreta!' });
-    }
-}));
-
-// Simulação das rotas da API (carregamento dinâmico)
-app.post('/api/login', createHandler(async (req, res) => {
-    const { password } = req.body;
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    console.log('🔐 Tentativa de login...');
-    
-    // Primeiro testa a conexão com o banco
-    try {
-        const connectionTest = await database.testConnection();
-        if (!connectionTest) {
-            console.log('❌ Falha na conexão com banco de dados');
-            return res.status(500).json({ success: false, message: 'Erro de conexão com banco de dados!' });
-        }
-        console.log('✅ Conexão com banco OK');
-    } catch (error) {
-        console.error('❌ Erro ao testar conexão:', error);
-        return res.status(500).json({ success: false, message: 'Erro de conexão!' });
-    }
-
-    if (password === (process.env.ADMIN_PASSWORD || 'admin123')) {
-        console.log('✅ Login bem-sucedido!');
-        return res.status(200).json({ success: true });
-    } else {
-        console.log('❌ Senha incorreta');
-        return res.status(401).json({ success: false, message: 'Senha incorreta!' });
+        return res.status(401).json({ success: false, message: 'Senha incorreta' });
     }
 }));
 
@@ -597,148 +542,8 @@ app.delete('/api/tournaments/:id', createHandler(async (req, res) => {
     }
 }));
 
-// ROTAS PARA CÓDIGOS PURPLE COINS
-app.get('/api/codes', createHandler(async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    try {
-        // Conectar à database jojopix para códigos
-        const codeConnection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: 'jojopix',
-            port: process.env.DB_PORT || 3306
-        });
-
-        const [codes] = await codeConnection.execute(`
-            SELECT 
-                id,
-                code,
-                purple_coins_value,
-                used_by_discord_id,
-                used_at,
-                created_at,
-                expires_at,
-                created_by,
-                description,
-                CASE 
-                    WHEN used_by_discord_id IS NOT NULL THEN 'usado'
-                    WHEN expires_at < NOW() THEN 'expirado'
-                    ELSE 'ativo'
-                END as status
-            FROM purple_coin_codes 
-            ORDER BY created_at DESC
-        `);
-
-        await codeConnection.end();
-
-        return res.status(200).json({
-            success: true,
-            codes: codes
-        });
-
-    } catch (error) {
-        console.error('Erro ao buscar códigos:', error);
-        return res.status(500).json({ success: false, message: 'Erro ao buscar códigos' });
-    }
-}));
-
-app.post('/api/codes', createHandler(async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    try {
-        const { code, purple_coins_value, expires_at, description } = req.body;
-
-        if (!code || !purple_coins_value) {
-            return res.status(400).json({
-                success: false,
-                message: 'Código e valor são obrigatórios'
-            });
-        }
-
-        // Conectar à database jojopix para códigos
-        const codeConnection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: 'jojopix',
-            port: process.env.DB_PORT || 3306
-        });
-
-        // Verificar se o código já existe
-        const [existing] = await codeConnection.execute(
-            'SELECT id FROM purple_coin_codes WHERE code = ?',
-            [code]
-        );
-
-        if (existing.length > 0) {
-            await codeConnection.end();
-            return res.status(400).json({
-                success: false,
-                message: 'Este código já existe'
-            });
-        }
-
-        // Criar o código
-        await codeConnection.execute(`
-            INSERT INTO purple_coin_codes (code, purple_coins_value, expires_at, created_by, description)
-            VALUES (?, ?, ?, 'ADMIN_PANEL', ?)
-        `, [code, purple_coins_value, expires_at || null, description || null]);
-
-        await codeConnection.end();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Código criado com sucesso!'
-        });
-
-    } catch (error) {
-        console.error('Erro ao criar código:', error);
-        return res.status(500).json({ success: false, message: 'Erro ao criar código' });
-    }
-}));
-
-app.delete('/api/codes/:id', createHandler(async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    try {
-        const codeId = req.params.id;
-
-        // Conectar à database jojopix para códigos
-        const codeConnection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: 'jojopix',
-            port: process.env.DB_PORT || 3306
-        });
-
-        await codeConnection.execute('DELETE FROM purple_coin_codes WHERE id = ?', [codeId]);
-        await codeConnection.end();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Código excluído com sucesso!'
-        });
-
-    } catch (error) {
-        console.error('Erro ao excluir código:', error);
-        return res.status(500).json({ success: false, message: 'Erro ao excluir código' });
-    }
-}));
+const avatarsApi = require('./api/avatars');
+app.use('/api/avatars', avatarsApi);
 
 // Rota para servir o HTML principal
 app.get('/', (req, res) => {
