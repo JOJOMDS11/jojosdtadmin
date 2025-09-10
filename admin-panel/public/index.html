@@ -843,13 +843,13 @@
                         tbody.innerHTML = data.data.map(player => `
                         <tr>
                             <td><code>${player.discord_id}</code></td>
-                            <td>${player.name}</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>💰 ${player.purple_coins}</td>
+                            <td>${player.avatar ? player.avatar + ' ' : ''}${player.name}</td>
+                            <td>${player.total_cartas ?? 0}</td>
+                            <td>${player.prime ?? 0}</td>
+                            <td>${player.goat ?? 0}</td>
+                            <td>${player.medio ?? 0}</td>
+                            <td>${player.bagre ?? 0}</td>
+                            <td>💰 ${player.purple_coins ?? 0}</td>
                             <td>
                                 <button class="btn" onclick="addCoinsToUser('${player.discord_id}')">💰</button>
                             </td>

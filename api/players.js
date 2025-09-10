@@ -19,9 +19,21 @@ module.exports = async function handler(req, res) {
         if (req.method === 'GET') {
             try {
                 const rows = await database.executeQuery(
-                    'SELECT id, name, discord_id, goals, assists, saves, wins, losses, purple_coins, created_at FROM players ORDER BY created_at DESC'
+                    `SELECT 
+                        id, 
+                        name, 
+                        discord_id, 
+                        position, 
+                        avatar, 
+                        purple_coins, 
+                        goals, 
+                        assists, 
+                        wins, 
+                        losses, 
+                        created_at 
+                    FROM players ORDER BY created_at DESC`
                 );
-                return res.status(200).json(rows);
+                return res.status(200).json({ success: true, data: rows });
             } catch (error) {
                 console.error('Error fetching players:', error);
                 return res.status(200).json([]);
