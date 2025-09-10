@@ -105,6 +105,84 @@ module.exports = async function handler(req, res) {
                 }
             }
 
+        } else if (req.method === 'PUT') {
+            // Edit existing template
+            const { id, name, position, avatar } = req.body;
+
+            if (!id || !name || !position) {
+                return res.status(400).json({ error: 'ID, nome e posição são obrigatórios' });
+            }
+
+            try {
+                // Check if template exists
+                const [existing] = await connection.execute(
+                    'SELECT id FROM player_templates WHERE id = ?',
+                    [id]
+                );
+
+                if (existing.length === 0) {
+                    return res.status(404).json({ error: 'Template não encontrado' });
+                }
+
+                // Check if name already exists for other templates
+                const [nameCheck] = await connection.execute(
+                    'SELECT id FROM player_templates WHERE name = ? AND id != ?',
+                    [name, id]
+                );
+
+                if (nameCheck.length > 0) {
+                    return res.status(400).json({ error: 'Já existe outro template com este nome' });
+                }
+
+                // Update template
+                await connection.execute(
+                    'UPDATE player_templates SET name = ?, position = ?, avatar = ? WHERE id = ?',
+                    [name, position, avatar || '⚽', id]
+                );
+
+                return res.status(200).json({
+                    message: 'Template atualizado com sucesso'
+                });
+
+            } catch (updateError) {
+                console.error('Error updating template:', updateError);
+                throw updateError;
+            }
+
+        } else if (req.method === 'DELETE') {
+            // Delete template
+            const { id } = req.body;
+
+            if (!id) {
+                return res.status(400).json({ error: 'ID é obrigatório' });
+            }
+
+            try {
+                // Check if template exists
+                const [existing] = await connection.execute(
+                    'SELECT id FROM player_templates WHERE id = ?',
+                    [id]
+                );
+
+                if (existing.length === 0) {
+                    return res.status(404).json({ error: 'Template não encontrado' });
+                }
+
+                // Delete template
+                await connection.execute(
+                    'DELETE FROM player_templates WHERE id = ?',
+                    [id]
+                );
+
+                return res.status(200).json({
+                    message: 'Template excluído com sucesso'
+                });
+
+            } catch (deleteError) {
+                console.error('Error deleting template:', deleteError);
+                throw deleteError;
+            }
+
         } else {
             return res.status(405).json({ error: 'Método não permitido' });
         }

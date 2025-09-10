@@ -3,7 +3,12 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
-const database = require('./api/database');
+
+// Usar database otimizado para Vercel em produção, ou database normal local
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+const database = isProduction ? require('./api/database_vercel') : require('./api/database');
+
+console.log(`🔧 Usando database: ${isProduction ? 'VERCEL (otimizado)' : 'LOCAL (normal)'}`);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

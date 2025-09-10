@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { query } = require('../../src/database/connection');
+const { query } = require('./db');
 
 // POST /api/avatars
 router.post('/', async (req, res) => {
