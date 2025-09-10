@@ -220,6 +220,28 @@
             color: #666;
             margin-top: 5px;
         }
+
+        .code-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .code-status.ativo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .code-status.usado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .code-status.expirado {
+            background: #fff3cd;
+            color: #856404;
+        }
     </style>
 </head>
 
@@ -255,30 +277,7 @@
                 <button class="tab" onclick="showTab('templates')">⚙️ Templates</button>
                 <button class="tab" onclick="showTab('coins')">💰 Moedas</button>
                 <button class="tab" onclick="showTab('tournaments')">🏆 Torneios</button>
-                <button class="tab" onclick="showTab('codes')">🔑 Códigos</button>
-            <!-- Tab: Códigos -->
-            <div class="tab-content" id="codes">
-                <h3>🔑 Gerenciar Códigos de Purple Coins</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Valor</th>
-                                <th>Máx. Usos</th>
-                                <th>Restantes</th>
-                                <th>Expira em</th>
-                                <th>Status</th>
-                                <th>Usado por</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="codesTable">
-                            <!-- Carregado via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <button class="tab" onclick="showTab('codes')">🎟️ Códigos</button>
             </div>
 
             <!-- Status Messages -->
@@ -575,6 +574,57 @@
                 </div>
             </div>
 
+            <!-- Tab: Códigos -->
+            <div class="tab-content" id="codes">
+                <h3>🎟️ Gerenciar Códigos Purple Coins</h3>
+
+                <!-- Criar Código -->
+                <div class="card">
+                    <h4>➕ Criar Novo Código</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label for="codeText">Código:</label>
+                            <input type="text" id="codeText" placeholder="Ex: PC500_XPTO123">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeValue">Valor (Purple Coins):</label>
+                            <input type="number" id="codeValue" placeholder="500" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeExpires">Expira em (opcional):</label>
+                            <input type="datetime-local" id="codeExpires">
+                        </div>
+                        <button class="btn" onclick="createCode()">Criar</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="codeDescription">Descrição (opcional):</label>
+                        <input type="text" id="codeDescription" placeholder="Ex: Código promocional...">
+                    </div>
+                </div>
+
+                <!-- Lista de Códigos -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Usado por</th>
+                                <th>Usado em</th>
+                                <th>Expira em</th>
+                                <th>Criado em</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="codesTable">
+                            <!-- Carregado via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Logout -->
             <div style="text-align: center; margin-top: 30px;">
                 <button class="btn btn-danger" onclick="logout()">🚪 Sair</button>
@@ -638,73 +688,24 @@
 
         // Tab Management
         function showTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
 
-            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            // Show selected tab
             document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
 
+            // Load specific data
             if (tabName === 'teams') loadTeams();
             else if (tabName === 'players') loadPlayers();
             else if (tabName === 'templates') loadTemplates();
             else if (tabName === 'tournaments') loadTournaments();
             else if (tabName === 'codes') loadCodes();
-        }
-        // Load Codes
-        function loadCodes() {
-            fetch('/api/codes')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('codesTable');
-                    if (data.success && data.codes && data.codes.length > 0) {
-                        tbody.innerHTML = data.codes.map(code => {
-                            let status = 'Ativo';
-                            let statusColor = '#27ae60';
-                            if (code.remaining_uses === 0 || new Date(code.expires_at) < new Date()) {
-                                status = 'Expirado';
-                                statusColor = '#e74c3c';
-                            }
-                            return `
-                                <tr>
-                                    <td><code>${code.code}</code></td>
-                                    <td>${code.amount}</td>
-                                    <td>${code.max_uses}</td>
-                                    <td>${code.remaining_uses}</td>
-                                    <td>${new Date(code.expires_at).toLocaleDateString('pt-BR')}</td>
-                                    <td><span style="color: ${statusColor}">${status}</span></td>
-                                    <td>${code.used_by || '-'}</td>
-                                    <td>
-                                        <button class="btn btn-danger" onclick="deleteCode('${code.code}')">🗑️</button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('');
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="8">Nenhum código encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">Erro ao carregar códigos</td></tr>';
-                });
-        }
-
-        // Delete Code
-        function deleteCode(code) {
-            if (!confirm('Tem certeza que deseja excluir este código?')) return;
-            fetch(`/api/codes/${code}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Código excluído com sucesso!');
-                        loadCodes();
-                    } else {
-                        showStatus(data.message || 'Erro ao excluir código', 'error');
-                    }
-                });
         }
 
         // Load all data
@@ -713,6 +714,7 @@
             loadTeams();
             loadPlayers();
             loadTemplates();
+            loadCodes();
         }
 
         // Load Statistics
@@ -1413,6 +1415,97 @@
             else if (tabName === 'players') loadPlayers();
             else if (tabName === 'templates') loadTemplates();
             else if (tabName === 'tournaments') loadTournaments();
+        }
+
+        // Load Codes
+        function loadCodes() {
+            fetch('/api/codes')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.codes) {
+                        const tbody = document.getElementById('codesTable');
+                        tbody.innerHTML = data.codes.map(code => `
+                        <tr>
+                            <td>${code.id}</td>
+                            <td><code>${code.code}</code></td>
+                            <td>💰 ${code.purple_coins_value}</td>
+                            <td><span class="code-status ${code.status}">${code.status.toUpperCase()}</span></td>
+                            <td>${code.used_by_discord_id ? `<code>${code.used_by_discord_id}</code>` : '-'}</td>
+                            <td>${code.used_at ? new Date(code.used_at).toLocaleString('pt-BR') : '-'}</td>
+                            <td>${code.expires_at ? new Date(code.expires_at).toLocaleString('pt-BR') : 'Nunca'}</td>
+                            <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deleteCode('${code.id}')">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                    } else {
+                        document.getElementById('codesTable').innerHTML = '<tr><td colspan="9">Nenhum código encontrado</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar códigos:', error);
+                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="9">Erro ao carregar códigos</td></tr>';
+                });
+        }
+
+        // Create Code
+        function createCode() {
+            const code = document.getElementById('codeText').value.trim().toUpperCase();
+            const value = parseInt(document.getElementById('codeValue').value);
+            const expires = document.getElementById('codeExpires').value;
+            const description = document.getElementById('codeDescription').value.trim();
+
+            if (!code || !value) {
+                showStatus('Preencha código e valor!', 'error');
+                return;
+            }
+
+            fetch('/api/codes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code,
+                    purple_coins_value: value,
+                    expires_at: expires || null,
+                    description: description || null
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus('Código criado com sucesso!');
+                        document.getElementById('codeText').value = '';
+                        document.getElementById('codeValue').value = '';
+                        document.getElementById('codeExpires').value = '';
+                        document.getElementById('codeDescription').value = '';
+                        loadCodes();
+                    } else {
+                        showStatus(data.message || 'Erro ao criar código', 'error');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Erro na conexão: ' + error.message, 'error');
+                });
+        }
+
+        // Delete Code
+        function deleteCode(id) {
+            if (!confirm('Tem certeza que deseja excluir este código?')) return;
+
+            fetch(`/api/codes/${id}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus('Código excluído com sucesso!');
+                        loadCodes();
+                    } else {
+                        showStatus(data.message || 'Erro ao excluir código', 'error');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Erro na conexão: ' + error.message, 'error');
+                });
         }
 
         // Enter key for login
