@@ -8,8 +8,8 @@ module.exports = async function handler(req, res) {
         return res.status(200).end();
     }
 
-    return res.status(200).json({ 
-        status: 'ok', 
+    return res.status(200).json({
+        status: 'ok',
         message: 'API funcionando no Vercel!',
         timestamp: new Date().toISOString(),
         env: process.env.NODE_ENV || 'development'

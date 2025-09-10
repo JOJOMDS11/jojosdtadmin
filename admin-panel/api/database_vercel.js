@@ -7,7 +7,7 @@ let globalPool = null;
 function createVercelPool() {
     if (!globalPool) {
         console.log('🔧 Criando pool MySQL otimizado para Vercel...');
-        
+
         globalPool = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
@@ -29,7 +29,7 @@ function createVercelPool() {
             enableKeepAlive: true,
             keepAliveInitialDelay: 0
         });
-        
+
         console.log('✅ Pool Vercel criado!');
     }
     return globalPool;
@@ -39,20 +39,20 @@ function createVercelPool() {
 async function executeQuery(sql, params = []) {
     const maxRetries = 2;
     let lastError;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const pool = createVercelPool();
             console.log(`🔍 [Tentativa ${attempt}] Executando: ${sql.substring(0, 50)}...`);
-            
+
             const [rows] = await pool.execute(sql, params);
             console.log(`✅ Query executada! ${rows.length} resultados`);
             return rows;
-            
+
         } catch (error) {
             lastError = error;
             console.error(`❌ [Tentativa ${attempt}] Erro:`, error.message);
-            
+
             // Se não é o último attempt, aguarda um pouco antes de tentar novamente
             if (attempt < maxRetries) {
                 console.log('🔄 Tentando novamente em 1s...');
@@ -60,7 +60,7 @@ async function executeQuery(sql, params = []) {
             }
         }
     }
-    
+
     throw lastError;
 }
 

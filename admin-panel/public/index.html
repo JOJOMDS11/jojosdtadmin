@@ -276,6 +276,7 @@
                 <button class="tab" onclick="showTab('players')">🎴 Jogadores</button>
                 <button class="tab" onclick="showTab('templates')">⚙️ Templates</button>
                 <button class="tab" onclick="showTab('coins')">💰 Moedas</button>
+                <button class="tab" onclick="showTab('codes')">🎫 Códigos</button>
                 <button class="tab" onclick="showTab('tournaments')">🏆 Torneios</button>
                 <button class="tab" onclick="showTab('codes')">🎟️ Códigos</button>
             </div>
@@ -375,7 +376,10 @@
                         </div>
                         <div class="form-group">
                             <label for="templateAvatar">Avatar (Emoji ou Texto):</label>
-                            <input type="text" id="templateAvatar" placeholder="Ex: ⚽ ou Messi" maxlength="10">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="text" id="templateAvatar" placeholder="Ex: ⚽ ou Messi" maxlength="10" onInput="previewAvatar()">
+                                <span id="avatarPreview" style="font-size: 24px; min-width: 30px;">❓</span>
+                            </div>
                         </div>
                         <button class="btn" onclick="createTemplate()">Criar</button>
                     </div>
@@ -509,6 +513,66 @@
                         <button class="btn" onclick="searchUser()">Buscar</button>
                     </div>
                     <div id="userSearchResult"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Códigos -->
+            <div class="tab-content" id="codes">
+                <h3>🎫 Gerenciar Códigos Purple Coins</h3>
+
+                <!-- Gerar Código -->
+                <div class="card">
+                    <h4>➕ Gerar Código Purple Coins</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label for="codeValue">Valor do Código:</label>
+                            <input type="number" id="codeValue" placeholder="500" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeExpires">Expira em (horas):</label>
+                            <input type="number" id="codeExpires" placeholder="24" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="codeMaxUses">Máximo de Usos:</label>
+                            <input type="number" id="codeMaxUses" placeholder="1" min="1">
+                        </div>
+                        <button class="btn" onclick="createCode()">Gerar Código</button>
+                    </div>
+                </div>
+
+                <!-- Verificar Código -->
+                <div class="card">
+                    <h4>🔍 Verificar Código</h4>
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label for="verifyCodeInput">Código:</label>
+                            <input type="text" id="verifyCodeInput" placeholder="PC500_XXXXXXXX">
+                        </div>
+                        <button class="btn" onclick="verifyCode()">Verificar</button>
+                    </div>
+                    <div id="codeVerifyResult"></div>
+                </div>
+
+                <!-- Lista de Códigos -->
+                <div class="card">
+                    <h4>📋 Todos os Códigos</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Usos</th>
+                                <th>Expira em</th>
+                                <th>Criado em</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="codesTable">
+                            <tr><td colspan="8">Carregando códigos...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -719,7 +783,9 @@
 
         // Load Statistics
         function loadStats() {
-            fetch('/api/stats')
+            fetch('/api/stats', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
                 .then(response => response.json())
                 .then(data => {
                     // Novo formato de resposta direta do stats
@@ -804,7 +870,9 @@
 
         // Load Teams
         function loadTeams() {
-            fetch('/api/teams')
+            fetch('/api/teams', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -835,7 +903,9 @@
 
         // Load Players
         function loadPlayers() {
-            fetch('/api/players')
+            fetch('/api/players', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -843,13 +913,13 @@
                         tbody.innerHTML = data.data.map(player => `
                         <tr>
                             <td><code>${player.discord_id}</code></td>
-                            <td>${player.avatar ? player.avatar + ' ' : ''}${player.name}</td>
-                            <td>${player.total_cartas ?? 0}</td>
-                            <td>${player.prime ?? 0}</td>
-                            <td>${player.goat ?? 0}</td>
-                            <td>${player.medio ?? 0}</td>
-                            <td>${player.bagre ?? 0}</td>
-                            <td>💰 ${player.purple_coins ?? 0}</td>
+                            <td>${player.name}</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>💰 ${player.purple_coins}</td>
                             <td>
                                 <button class="btn" onclick="addCoinsToUser('${player.discord_id}')">💰</button>
                             </td>
@@ -867,7 +937,9 @@
 
         // Load Templates
         function loadTemplates() {
-            fetch('/api/templates')
+            fetch('/api/templates', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -877,7 +949,7 @@
                             <td>${template.id}</td>
                             <td>${template.name}</td>
                             <td>${template.position || '-'}</td>
-                            <td>${template.avatar || '-'}</td>
+                            <td style="font-size: 20px;">${template.avatar || '❓'}</td>
                             <td>${template.created_at ? new Date(template.created_at).toLocaleDateString('pt-BR') : '-'}</td>
                             <td>
                                 <button class="btn btn-danger" onclick="deleteTemplate('${template.id}')">🗑️</button>
@@ -921,6 +993,7 @@
                         showStatus('Jogador criado com sucesso!');
                         document.getElementById('templateName').value = '';
                         document.getElementById('templateAvatar').value = '';
+                        document.getElementById('avatarPreview').textContent = '❓';
                         loadTemplates();
                         loadStats();
                     } else {
@@ -1087,6 +1160,161 @@
             if (!discordId || !amount) {
                 showStatus('Preencha Discord ID e quantidade!', 'error');
                 return;
+            }
+
+            fetch('/api/coins/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ discord_id: discordId, amount })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus(`Moedas adicionadas! Saldo atual: ${data.currentBalance}`);
+                        document.getElementById('coinDiscordId').value = '';
+                        document.getElementById('coinAmount').value = '';
+                    } else {
+                        showStatus(data.error, 'error');
+                    }
+                });
+        }
+
+        // Preview Avatar
+        function previewAvatar() {
+            const avatarInput = document.getElementById('templateAvatar');
+            const preview = document.getElementById('avatarPreview');
+            preview.textContent = avatarInput.value || '❓';
+        }
+
+        // Codes Management Functions
+        function createCode() {
+            const value = parseInt(document.getElementById('codeValue').value);
+            const expiresIn = parseInt(document.getElementById('codeExpires').value);
+            const maxUses = parseInt(document.getElementById('codeMaxUses').value);
+
+            if (!value || !expiresIn || !maxUses) {
+                showStatus('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            fetch('/api/codes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value, expires_in_hours: expiresIn, max_uses: maxUses })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus(`Código criado: ${data.code}`, 'success');
+                        document.getElementById('codeValue').value = '';
+                        document.getElementById('codeExpires').value = '';
+                        document.getElementById('codeMaxUses').value = '';
+                        loadCodes();
+                    } else {
+                        showStatus(data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao criar código:', error);
+                    showStatus('Erro ao criar código', 'error');
+                });
+        }
+
+        function verifyCode() {
+            const code = document.getElementById('verifyCodeInput').value.trim();
+            
+            if (!code) {
+                showStatus('Digite um código para verificar!', 'error');
+                return;
+            }
+
+            fetch(`/api/codes/verify/${encodeURIComponent(code)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('codeVerifyResult');
+                    if (data.success) {
+                        const codeData = data.code;
+                        const statusColor = codeData.is_active ? '#28a745' : '#dc3545';
+                        const statusText = codeData.is_active ? '✅ Ativo' : '❌ Inativo';
+                        
+                        resultDiv.innerHTML = `
+                            <div class="card" style="margin-top: 15px; border-left-color: ${statusColor};">
+                                <h4>🎫 ${codeData.code}</h4>
+                                <p><strong>Valor:</strong> ${codeData.value} Purple Coins</p>
+                                <p><strong>Status:</strong> ${statusText}</p>
+                                <p><strong>Usos:</strong> ${codeData.current_uses}/${codeData.max_uses}</p>
+                                <p><strong>Expira em:</strong> ${new Date(codeData.expires_at).toLocaleString('pt-BR')}</p>
+                                <p><strong>Criado em:</strong> ${new Date(codeData.created_at).toLocaleString('pt-BR')}</p>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
+                                <p>❌ ${data.error}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar código:', error);
+                    document.getElementById('codeVerifyResult').innerHTML = `
+                        <div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
+                            <p>❌ Erro ao verificar código</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function loadCodes() {
+            fetch('/api/codes', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('codesTable');
+                    if (data.success && data.codes.length > 0) {
+                        tbody.innerHTML = data.codes.map(code => `
+                            <tr>
+                                <td>${code.id}</td>
+                                <td><code>${code.code}</code></td>
+                                <td>${code.value}</td>
+                                <td>${code.is_active ? '<span style="color: #28a745;">✅ Ativo</span>' : '<span style="color: #dc3545;">❌ Inativo</span>'}</td>
+                                <td>${code.current_uses}/${code.max_uses}</td>
+                                <td>${new Date(code.expires_at).toLocaleString('pt-BR')}</td>
+                                <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteCode('${code.code}')">🗑️</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="8">📦 Nenhum código encontrado</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar códigos:', error);
+                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">❌ Erro ao carregar códigos</td></tr>';
+                });
+        }
+
+        function deleteCode(code) {
+            if (!confirm(`Tem certeza que deseja excluir o código ${code}?`)) return;
+
+            fetch(`/api/codes/${encodeURIComponent(code)}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus('Código excluído com sucesso!', 'success');
+                        loadCodes();
+                    } else {
+                        showStatus(data.error || 'Erro ao excluir código', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir código:', error);
+                    showStatus('Erro ao excluir código', 'error');
+                });
+        }
             }
 
             fetch('/api/coins', {

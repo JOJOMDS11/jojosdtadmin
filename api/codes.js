@@ -69,7 +69,7 @@ module.exports = async function handler(req, res) {
 
                 // Generate unique code
                 const code = 'PC' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4).toUpperCase();
-                
+
                 // Insert new código
                 const result = await database.executeQuery(
                     'INSERT INTO purple_coins_codes (code, coin_amount, expiry_hours, max_uses, uses_count, created_at, is_active) VALUES (?, ?, ?, ?, 0, NOW(), 1)',
@@ -125,7 +125,7 @@ module.exports = async function handler(req, res) {
                     return res.status(400).json({ error: 'Código esgotado' });
                 }
 
-                return res.status(200).json({ 
+                return res.status(200).json({
                     valid: true,
                     coin_amount: codeData.coin_amount,
                     remaining_uses: codeData.max_uses - codeData.uses_count,

@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
     const { password } = req.body;
 
     console.log('🔐 [VERCEL] Tentativa de login...');
-    
+
     // Primeiro testa a conexão com o banco
     try {
         const connectionTest = await database.testConnection();

@@ -24,7 +24,7 @@ function createPool() {
             reconnect: true,
             charset: 'utf8mb4'
         });
-        
+
         console.log('✅ Pool de conexões criado!');
     }
     return pool;
@@ -33,7 +33,7 @@ function createPool() {
 // Função para executar queries
 async function executeQuery(sql, params = []) {
     const connection = createPool();
-    
+
     try {
         console.log(`🔍 Executando query: ${sql.substring(0, 50)}...`);
         const [rows] = await connection.execute(sql, params);

@@ -43,7 +43,7 @@ app.post('/api/login', createHandler(async (req, res) => {
     }
 
     console.log('🔐 Tentativa de login...');
-    
+
     // Primeiro testa a conexão com o banco
     try {
         const connectionTest = await database.testConnection();
@@ -79,7 +79,7 @@ app.post('/api/login', createHandler(async (req, res) => {
     }
 
     console.log('🔐 Tentativa de login...');
-    
+
     // Primeiro testa a conexão com o banco
     try {
         const connectionTest = await database.testConnection();
