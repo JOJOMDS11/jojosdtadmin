@@ -21,6 +21,20 @@ module.exports = async function handler(req, res) {
         if (req.method === 'GET') {
             // Get all códigos
             try {
+                // First, ensure table exists
+                await database.executeQuery(`
+                    CREATE TABLE IF NOT EXISTS purple_coins_codes (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        code VARCHAR(255) UNIQUE NOT NULL,
+                        coin_amount INT NOT NULL,
+                        expiry_hours INT NOT NULL,
+                        max_uses INT NOT NULL,
+                        uses_count INT DEFAULT 0,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+
                 const rows = await database.executeQuery(
                     'SELECT id, code, coin_amount, expiry_hours, max_uses, uses_count, created_at, is_active FROM purple_coins_codes ORDER BY created_at DESC'
                 );
@@ -39,6 +53,20 @@ module.exports = async function handler(req, res) {
             }
 
             try {
+                // First, ensure table exists
+                await database.executeQuery(`
+                    CREATE TABLE IF NOT EXISTS purple_coins_codes (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        code VARCHAR(255) UNIQUE NOT NULL,
+                        coin_amount INT NOT NULL,
+                        expiry_hours INT NOT NULL,
+                        max_uses INT NOT NULL,
+                        uses_count INT DEFAULT 0,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+
                 // Generate unique code
                 const code = 'PC' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4).toUpperCase();
                 
@@ -55,7 +83,7 @@ module.exports = async function handler(req, res) {
                 });
             } catch (error) {
                 console.error('Error creating código:', error);
-                return res.status(500).json({ error: 'Erro ao criar código' });
+                return res.status(500).json({ error: 'Erro ao criar código: ' + error.message });
             }
 
         } else if (req.method === 'PUT') {
