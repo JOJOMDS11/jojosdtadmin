@@ -1,0 +1,4 @@
+Redeploy trigger file
+Created to force Vercel to redeploy the site after administrative fixes.
+Time (UTC): 2025-09-09T00:00:00Z
+Remove this file if you don't want repeated redeploys.
