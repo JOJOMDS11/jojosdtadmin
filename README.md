@@ -26,8 +26,6 @@ npx vercel --prod
 
 ### 5. **Funcionalidades Incluídas**
 
-#### 🔐 **Login Administrativo**
-- **Senha**: `eojojos` (conforme solicitado)
 
 #### 📊 **Dashboard**
 - Estatísticas gerais do bot
