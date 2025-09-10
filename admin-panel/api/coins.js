@@ -1,9 +1,10 @@
-const { query } = require('./db');
+const connection = require('./connection');
+const mysql = require('mysql2/promise');
 
-export default async function handler(req, res) {
-    // Configurar CORS
+module.exports = async function handler(req, res) {
+    // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
@@ -12,98 +13,125 @@ export default async function handler(req, res) {
 
     try {
         if (req.method === 'GET') {
-            // Buscar estatísticas de purple coins
-            const coinsStats = await query(`
+            // Buscar códigos Purple Coins da database jojopix
+            const codeConnection = await mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: 'jojopix',
+                port: process.env.DB_PORT || 3306
+            });
+
+            const [codes] = await codeConnection.execute(`
                 SELECT 
-                    SUM(purple_coins) as total_coins,
-                    COUNT(*) as total_players,
-                    AVG(purple_coins) as avg_coins,
-                    MAX(purple_coins) as max_coins
-                FROM players
+                    id,
+                    code,
+                    purple_coins_value,
+                    used_by_discord_id,
+                    used_at,
+                    created_at,
+                    expires_at,
+                    created_by,
+                    description,
+                    CASE 
+                        WHEN used_by_discord_id IS NOT NULL THEN 'usado'
+                        WHEN expires_at < NOW() THEN 'expirado'
+                        ELSE 'ativo'
+                    END as status
+                FROM purple_coin_codes 
+                ORDER BY created_at DESC
             `);
 
-            // Top 10 jogadores com mais coins
-            const topPlayers = await query(`
-                SELECT discord_id, purple_coins
-                FROM players
-                ORDER BY purple_coins DESC
-                LIMIT 10
-            `);
+            await codeConnection.end();
 
             return res.status(200).json({
                 success: true,
-                data: {
-                    stats: coinsStats[0],
-                    topPlayers: topPlayers
-                }
+                codes: codes
             });
 
         } else if (req.method === 'POST') {
-            const { discord_id, amount, action } = req.body;
+            const { code, purple_coins_value, expires_at, description } = req.body;
 
-            if (!discord_id || !amount || !action) {
+            if (!code || !purple_coins_value) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Discord ID, amount e action são obrigatórios'
+                    message: 'Código e valor são obrigatórios'
                 });
             }
 
-            // Buscar jogador atual
-            const player = await query(`
-                SELECT purple_coins FROM players WHERE discord_id = ?
-            `, [discord_id]);
+            // Conectar à database jojopix para códigos
+            const codeConnection = await mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: 'jojopix',
+                port: process.env.DB_PORT || 3306
+            });
 
-            if (player.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Jogador não encontrado'
-                });
-            }
+            // Verificar se o código já existe
+            const [existing] = await codeConnection.execute(
+                'SELECT id FROM purple_coin_codes WHERE code = ?',
+                [code]
+            );
 
-            let newAmount;
-            if (action === 'add') {
-                newAmount = player[0].purple_coins + parseInt(amount);
-            } else if (action === 'remove') {
-                newAmount = Math.max(0, player[0].purple_coins - parseInt(amount));
-            } else if (action === 'set') {
-                newAmount = parseInt(amount);
-            } else {
+            if (existing.length > 0) {
+                await codeConnection.end();
                 return res.status(400).json({
                     success: false,
-                    message: 'Action deve ser: add, remove ou set'
+                    message: 'Este código já existe'
                 });
             }
 
-            // Atualizar coins do jogador
-            await query(`
-                UPDATE players 
-                SET purple_coins = ? 
-                WHERE discord_id = ?
-            `, [newAmount, discord_id]);
+            // Criar o código
+            await codeConnection.execute(`
+                INSERT INTO purple_coin_codes (code, purple_coins_value, expires_at, created_by, description)
+                VALUES (?, ?, ?, 'ADMIN_PANEL', ?)
+            `, [code, purple_coins_value, expires_at || null, description || null]);
+
+            await codeConnection.end();
 
             return res.status(200).json({
                 success: true,
-                message: `Purple coins ${action === 'add' ? 'adicionados' : action === 'remove' ? 'removidos' : 'definidos'} com sucesso`,
-                data: {
-                    discord_id,
-                    old_amount: player[0].purple_coins,
-                    new_amount: newAmount
-                }
+                message: 'Código criado com sucesso!'
             });
 
-        } else {
-            return res.status(405).json({
-                success: false,
-                message: 'Método não permitido'
+        } else if (req.method === 'DELETE') {
+            // Extrair ID da URL
+            const url = req.url || '';
+            const match = url.match(/\/api\/codes\/(\d+)/);
+            if (!match) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'ID do código não fornecido'
+                });
+            }
+
+            const codeId = match[1];
+
+            // Conectar à database jojopix para códigos
+            const codeConnection = await mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: 'jojopix',
+                port: process.env.DB_PORT || 3306
+            });
+
+            await codeConnection.execute('DELETE FROM purple_coin_codes WHERE id = ?', [codeId]);
+            await codeConnection.end();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Código excluído com sucesso!'
             });
         }
 
     } catch (error) {
-        console.error('Erro na API de coins:', error);
-        return res.status(500).json({
-            success: false,
+        console.error('Erro na API de códigos:', error);
+        return res.status(500).json({ 
+            success: false, 
             message: 'Erro interno do servidor',
-            error: error.message
+            details: error.message 
         });
     }
-}
+};
