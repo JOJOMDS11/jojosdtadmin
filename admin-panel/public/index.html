@@ -722,32 +722,48 @@
             fetch('/api/stats')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success && data.data) {
-                        document.getElementById('statsContainer').innerHTML = `
+                    // Novo formato de resposta direta do stats
+                    document.getElementById('statsContainer').innerHTML = `
                         <div class="stat-card">
-                            <div class="stat-number">${data.data.totalPlayers || 0}</div>
+                            <div class="stat-number">${data.totalUsers || 0}</div>
                             <div class="stat-label">👥 Total Usuários</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">${data.data.totalTeams || 0}</div>
+                            <div class="stat-number">${data.totalTeams || 0}</div>
                             <div class="stat-label">🏆 Times Criados</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">${data.data.totalCards || 0}</div>
+                            <div class="stat-number">${data.totalCards || 0}</div>
                             <div class="stat-label">🎴 Total Cartas</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">${data.data.totalTemplates || 0}</div>
+                            <div class="stat-number">${data.totalTemplates || 0}</div>
                             <div class="stat-label">⚙️ Templates</div>
                         </div>
                     `;
-                    } else {
-                        console.error('Erro ao carregar stats:', data);
-                        document.getElementById('statsContainer').innerHTML = `
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar stats:', error);
+                    document.getElementById('statsContainer').innerHTML = `
                         <div class="stat-card">
                             <div class="stat-number">0</div>
                             <div class="stat-label">👥 Total Usuários</div>
                         </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">🏆 Times Criados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">🎴 Total Cartas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">⚙️ Templates</div>
+                        </div>
+                    `;
+                });
+        }
                         <div class="stat-card">
                             <div class="stat-number">0</div>
                             <div class="stat-label">🏆 Times Criados</div>
@@ -1419,69 +1435,86 @@
 
         // Load Codes
         function loadCodes() {
-            fetch('/api/codes')
+            fetch('/api/codes', {
+                headers: { 'Authorization': 'Bearer admin123' }
+            })
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.codes) {
-                        const tbody = document.getElementById('codesTable');
-                        tbody.innerHTML = data.codes.map(code => `
-                        <tr>
-                            <td>${code.id}</td>
-                            <td><code>${code.code}</code></td>
-                            <td>💰 ${code.purple_coins_value}</td>
-                            <td><span class="code-status ${code.status}">${code.status.toUpperCase()}</span></td>
-                            <td>${code.used_by_discord_id ? `<code>${code.used_by_discord_id}</code>` : '-'}</td>
-                            <td>${code.used_at ? new Date(code.used_at).toLocaleString('pt-BR') : '-'}</td>
-                            <td>${code.expires_at ? new Date(code.expires_at).toLocaleString('pt-BR') : 'Nunca'}</td>
-                            <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
-                            <td>
-                                <button class="btn btn-danger" onclick="deleteCode('${code.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `).join('');
+                .then(codes => {
+                    const tbody = document.getElementById('codesTable');
+                    if (codes && codes.length > 0) {
+                        tbody.innerHTML = codes.map(code => {
+                            const isExpired = code.expiry_hours && 
+                                new Date(code.created_at).getTime() + (code.expiry_hours * 60 * 60 * 1000) < Date.now();
+                            const isExhausted = code.uses_count >= code.max_uses;
+                            const status = !code.is_active ? 'INATIVO' : 
+                                         isExpired ? 'EXPIRADO' : 
+                                         isExhausted ? 'ESGOTADO' : 'ATIVO';
+                            const statusClass = status === 'ATIVO' ? 'active' : 'expired';
+                            
+                            return `
+                            <tr>
+                                <td>${code.id}</td>
+                                <td><code>${code.code}</code></td>
+                                <td>💰 ${code.coin_amount}</td>
+                                <td><span class="code-status ${statusClass}">${status}</span></td>
+                                <td>${code.uses_count}/${code.max_uses}</td>
+                                <td>${code.expiry_hours}h</td>
+                                <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteCode('${code.id}')">🗑️</button>
+                                </td>
+                            </tr>
+                        `;}).join('');
                     } else {
-                        document.getElementById('codesTable').innerHTML = '<tr><td colspan="9">Nenhum código encontrado</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="8">Nenhum código encontrado</td></tr>';
                     }
                 })
                 .catch(error => {
                     console.error('Erro ao carregar códigos:', error);
-                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="9">Erro ao carregar códigos</td></tr>';
+                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">Erro ao carregar códigos</td></tr>';
                 });
         }
 
         // Create Code
         function createCode() {
-            const code = document.getElementById('codeText').value.trim().toUpperCase();
             const value = parseInt(document.getElementById('codeValue').value);
-            const expires = document.getElementById('codeExpires').value;
-            const description = document.getElementById('codeDescription').value.trim();
+            const expires = parseInt(document.getElementById('codeExpires').value);
+            const maxUses = parseInt(document.getElementById('codeMaxUses').value);
 
-            if (!code || !value) {
-                showStatus('Preencha código e valor!', 'error');
+            if (!value || !expires || !maxUses) {
+                showStatus('Preencha todos os campos!', 'error');
                 return;
             }
 
             fetch('/api/codes', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer admin123'
+                },
                 body: JSON.stringify({
-                    code,
-                    purple_coins_value: value,
-                    expires_at: expires || null,
-                    description: description || null
+                    coin_amount: value,
+                    expiry_hours: expires,
+                    max_uses: maxUses
                 })
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        showStatus('Código criado com sucesso!');
-                        document.getElementById('codeText').value = '';
+                    if (data.id) {
+                        showStatus(`Código criado: ${data.code}`, 'success');
                         document.getElementById('codeValue').value = '';
                         document.getElementById('codeExpires').value = '';
-                        document.getElementById('codeDescription').value = '';
+                        document.getElementById('codeMaxUses').value = '';
                         loadCodes();
                     } else {
-                        showStatus(data.message || 'Erro ao criar código', 'error');
+                        showStatus(data.error || 'Erro ao criar código', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao criar código:', error);
+                    showStatus('Erro ao criar código', 'error');
+                });
+        }
                     }
                 })
                 .catch(error => {
@@ -1493,8 +1526,28 @@
         function deleteCode(id) {
             if (!confirm('Tem certeza que deseja excluir este código?')) return;
 
-            fetch(`/api/codes/${id}`, { method: 'DELETE' })
+            fetch('/api/codes', { 
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer admin123'
+                },
+                body: JSON.stringify({ id })
+            })
                 .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        showStatus('Código excluído com sucesso!', 'success');
+                        loadCodes();
+                    } else {
+                        showStatus(data.error || 'Erro ao excluir código', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir código:', error);
+                    showStatus('Erro ao excluir código', 'error');
+                });
+        }
                 .then(data => {
                     if (data.success) {
                         showStatus('Código excluído com sucesso!');
