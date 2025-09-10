@@ -1,8 +1,42 @@
-require('dotenv').config();
-const express = require('express');
+require('dotenv').config();// Simulação das rotas da API (carregamento dinâmico)
+app.post('/api/login', createHandler(async (req, res) => {
+    const { password } = req.body;
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    console.log('🔐 Tentativa de login...');
+    
+    // Primeiro testa a conexão com o banco
+    try {
+        const connectionTest = await database.testConnection();
+        if (!connectionTest) {
+            console.log('❌ Falha na conexão com banco de dados');
+            return res.status(500).json({ success: false, message: 'Erro de conexão com banco de dados!' });
+        }
+        console.log('✅ Conexão com banco OK');
+    } catch (error) {
+        console.error('❌ Erro ao testar conexão:', error);
+        return res.status(500).json({ success: false, message: 'Erro de conexão!' });
+    }
+
+    if (password === (process.env.ADMIN_PASSWORD || 'admin123')) {
+        console.log('✅ Login bem-sucedido!');
+        return res.status(200).json({ success: true });
+    } else {
+        console.log('❌ Senha incorreta');
+        return res.status(401).json({ success: false, message: 'Senha incorreta!' });
+    }
+}));require('express');
 const path = require('path');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
+const database = require('./api/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,10 +70,27 @@ app.post('/api/login', createHandler(async (req, res) => {
         return res.status(200).end();
     }
 
+    console.log('🔐 Tentativa de login...');
+    
+    // Primeiro testa a conexão com o banco
+    try {
+        const connectionTest = await database.testConnection();
+        if (!connectionTest) {
+            console.log('❌ Falha na conexão com banco de dados');
+            return res.status(500).json({ success: false, message: 'Erro de conexão com banco de dados!' });
+        }
+        console.log('✅ Conexão com banco OK');
+    } catch (error) {
+        console.error('❌ Erro ao testar conexão:', error);
+        return res.status(500).json({ success: false, message: 'Erro de conexão!' });
+    }
+
     if (password === (process.env.ADMIN_PASSWORD || 'admin123')) {
+        console.log('✅ Login bem-sucedido!');
         return res.status(200).json({ success: true });
     } else {
-        return res.status(401).json({ success: false, message: 'Senha incorreta' });
+        console.log('❌ Senha incorreta');
+        return res.status(401).json({ success: false, message: 'Senha incorreta!' });
     }
 }));
 
