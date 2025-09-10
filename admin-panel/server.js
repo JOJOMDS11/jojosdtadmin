@@ -42,6 +42,7 @@ app.delete('/api/tournaments/:id', createHandler('./api/tournaments'));
 app.get('/api/codes', createHandler('./api/coins'));
 app.post('/api/codes', createHandler('./api/coins'));
 app.delete('/api/codes/:id', createHandler('./api/coins'));
+app.get('/api/user/:discordId', createHandler('./api/user/[discordId]'));
 
 // Rota para servir o HTML principal
 app.get('/', (req, res) => {

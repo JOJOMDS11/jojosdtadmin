@@ -4,19 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 HaxBall DreamTeam - Admin Panel</title>
+    <title>Painel Administrativo - HaxBall DreamTeam</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
         }
 
         .container {
@@ -377,15 +372,15 @@
                         <div class="form-group">
                             <label for="templateAvatar">Avatar (Emoji ou Texto):</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="text" id="templateAvatar" placeholder="Ex: ⚽ ou Messi" maxlength="10" onInput="previewAvatar()">
+                                <input type="text" id="templateAvatar" placeholder="Ex: ⚽ ou Messi" maxlength="10"
+                                    onInput="previewAvatar()">
                                 <span id="avatarPreview" style="font-size: 24px; min-width: 30px;">❓</span>
                             </div>
                         </div>
-                        <button class="btn" onclick="createTemplate()">Criar</button>
+                        <button class="btn" onclick="createTemplate()">➕ Criar</button>
                     </div>
                 </div>
 
-                <!-- Lista de Templates -->
                 <div class="table-container">
                     <table>
                         <thead>
@@ -412,56 +407,48 @@
                 <!-- Criar Torneio -->
                 <div class="card">
                     <h4>➕ Criar Novo Torneio</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label for="tournamentName">Nome do Torneio:</label>
-                            <input type="text" id="tournamentName" placeholder="Copa HaxBall 2025">
+                    <form id="createTournamentForm">
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div class="form-group">
+                                <label for="tournamentName">Nome:</label>
+                                <input type="text" id="tournamentName" placeholder="Ex: Copa HaxBall" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentDate">Data:</label>
+                                <input type="date" id="tournamentDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentTime">Horário:</label>
+                                <input type="time" id="tournamentTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentFormat">Formato:</label>
+                                <select id="tournamentFormat">
+                                    <option value="Mata-mata">Mata-mata</option>
+                                    <option value="Pontos Corridos">Pontos Corridos</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="tournamentDate">Data:</label>
-                            <input type="date" id="tournamentDate">
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                            <div class="form-group">
+                                <label for="tournamentMaxPlayers">Máx. Times:</label>
+                                <input type="number" id="tournamentMaxPlayers" placeholder="Ex: 8" min="2" value="8">
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentPrize1st">1º Lugar:</label>
+                                <input type="text" id="tournamentPrize1st" placeholder="Ex: 1000 coins">
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentPrize2nd">2º Lugar:</label>
+                                <input type="text" id="tournamentPrize2nd" placeholder="Ex: 500 coins">
+                            </div>
+                            <button type="submit" class="btn">➕ Criar Torneio</button>
                         </div>
-                        <div class="form-group">
-                            <label for="tournamentTime">Horário:</label>
-                            <input type="time" id="tournamentTime">
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label for="tournamentFormat">Formato:</label>
-                            <select id="tournamentFormat">
-                                <option value="Mata-mata">Mata-mata</option>
-                                <option value="Pontos Corridos">Pontos Corridos</option>
-                                <option value="Grupos + Mata-mata">Grupos + Mata-mata</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="tournamentMaxPlayers">Máximo de Times:</label>
-                            <select id="tournamentMaxPlayers">
-                                <option value="8">8 Times</option>
-                                <option value="16">16 Times</option>
-                                <option value="32">32 Times</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
-                        <div class="form-group">
-                            <label for="tournamentPrize1st">1º Lugar (Coins):</label>
-                            <input type="number" id="tournamentPrize1st" placeholder="1000">
-                        </div>
-                        <div class="form-group">
-                            <label for="tournamentPrize2nd">2º Lugar (Coins):</label>
-                            <input type="number" id="tournamentPrize2nd" placeholder="500">
-                        </div>
-                        <div class="form-group">
-                            <label for="tournamentPrize3rd">3º Lugar (Coins):</label>
-                            <input type="number" id="tournamentPrize3rd" placeholder="250">
-                        </div>
-                        <button class="btn" onclick="createTournament()">🏆 Criar</button>
-                    </div>
+                    </form>
                 </div>
 
-                <!-- Lista de Torneios -->
                 <div class="table-container">
                     <table>
                         <thead>
@@ -471,7 +458,6 @@
                                 <th>Data</th>
                                 <th>Horário</th>
                                 <th>Formato</th>
-                                <th>Max Times</th>
                                 <th>Inscritos</th>
                                 <th>Status</th>
                                 <th>Ações</th>
@@ -483,79 +469,32 @@
                     </table>
                 </div>
             </div>
-            <div class="tab-content" id="coins">
-                <h3>💰 Gerenciar Purple Coins</h3>
-
-                <!-- Adicionar Moedas -->
-                <div class="card">
-                    <h4>➕ Adicionar Purple Coins</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: end;">
-                        <div class="form-group">
-                            <label for="coinDiscordId">Discord ID do Usuário:</label>
-                            <input type="text" id="coinDiscordId" placeholder="123456789012345678">
-                        </div>
-                        <div class="form-group">
-                            <label for="coinAmount">Quantidade:</label>
-                            <input type="number" id="coinAmount" placeholder="100" min="1">
-                        </div>
-                        <button class="btn" onclick="addCoins()">Adicionar</button>
-                    </div>
-                </div>
-
-                <!-- Buscar Usuário -->
-                <div class="card">
-                    <h4>🔍 Buscar Usuário</h4>
-                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: end;">
-                        <div class="form-group">
-                            <label for="searchUserId">Discord ID:</label>
-                            <input type="text" id="searchUserId" placeholder="Digite o Discord ID">
-                        </div>
-                        <button class="btn" onclick="searchUser()">Buscar</button>
-                    </div>
-                    <div id="userSearchResult"></div>
-                </div>
-            </div>
 
             <!-- Tab: Códigos -->
             <div class="tab-content" id="codes">
-                <h3>🎫 Gerenciar Códigos Purple Coins</h3>
+                <h3>🎫 Gerenciar Códigos de Purple Coins</h3>
 
-                <!-- Gerar Código -->
+                <!-- Criar Código -->
                 <div class="card">
-                    <h4>➕ Gerar Código Purple Coins</h4>
+                    <h4>➕ Criar Novo Código</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
                         <div class="form-group">
-                            <label for="codeValue">Valor do Código:</label>
-                            <input type="number" id="codeValue" placeholder="500" min="1">
+                            <label for="codeValue">Valor (Purple Coins):</label>
+                            <input type="number" id="codeValue" placeholder="Ex: 100" min="1">
                         </div>
                         <div class="form-group">
                             <label for="codeExpires">Expira em (horas):</label>
-                            <input type="number" id="codeExpires" placeholder="24" min="1">
+                            <input type="number" id="codeExpires" placeholder="Ex: 24" min="1">
                         </div>
                         <div class="form-group">
                             <label for="codeMaxUses">Máximo de Usos:</label>
-                            <input type="number" id="codeMaxUses" placeholder="1" min="1">
+                            <input type="number" id="codeMaxUses" placeholder="Ex: 10" min="1">
                         </div>
-                        <button class="btn" onclick="createCode()">Gerar Código</button>
+                        <button class="btn" onclick="createCode()">➕ Criar</button>
                     </div>
                 </div>
 
-                <!-- Verificar Código -->
-                <div class="card">
-                    <h4>🔍 Verificar Código</h4>
-                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: end;">
-                        <div class="form-group">
-                            <label for="verifyCodeInput">Código:</label>
-                            <input type="text" id="verifyCodeInput" placeholder="PC500_XXXXXXXX">
-                        </div>
-                        <button class="btn" onclick="verifyCode()">Verificar</button>
-                    </div>
-                    <div id="codeVerifyResult"></div>
-                </div>
-
-                <!-- Lista de Códigos -->
-                <div class="card">
-                    <h4>📋 Todos os Códigos</h4>
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -564,13 +503,13 @@
                                 <th>Valor</th>
                                 <th>Status</th>
                                 <th>Usos</th>
-                                <th>Expira em</th>
+                                <th>Expira</th>
                                 <th>Criado em</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="codesTable">
-                            <tr><td colspan="8">Carregando códigos...</td></tr>
+                            <!-- Carregado via JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -638,57 +577,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Códigos -->
-            <div class="tab-content" id="codes">
-                <h3>🎟️ Gerenciar Códigos Purple Coins</h3>
-
-                <!-- Criar Código -->
-                <div class="card">
-                    <h4>➕ Criar Novo Código</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
-                        <div class="form-group">
-                            <label for="codeText">Código:</label>
-                            <input type="text" id="codeText" placeholder="Ex: PC500_XPTO123">
-                        </div>
-                        <div class="form-group">
-                            <label for="codeValue">Valor (Purple Coins):</label>
-                            <input type="number" id="codeValue" placeholder="500" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="codeExpires">Expira em (opcional):</label>
-                            <input type="datetime-local" id="codeExpires">
-                        </div>
-                        <button class="btn" onclick="createCode()">Criar</button>
-                    </div>
-                    <div class="form-group">
-                        <label for="codeDescription">Descrição (opcional):</label>
-                        <input type="text" id="codeDescription" placeholder="Ex: Código promocional...">
-                    </div>
-                </div>
-
-                <!-- Lista de Códigos -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Código</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Usado por</th>
-                                <th>Usado em</th>
-                                <th>Expira em</th>
-                                <th>Criado em</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="codesTable">
-                            <!-- Carregado via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- Logout -->
             <div style="text-align: center; margin-top: 30px;">
                 <button class="btn btn-danger" onclick="logout()">🚪 Sair</button>
@@ -697,496 +585,218 @@
     </div>
 
     <script>
-        let isLoggedIn = false;
+        // Single clean script: handles login and basic data loads.
+        (function () {
+            let adminToken = '';
 
-        // Login
-        function login() {
-            const password = document.getElementById('adminPassword').value;
+            function showLoginStatus(message, type) {
+                const status = document.getElementById('loginStatus');
+                if (!status) return;
+                status.textContent = message;
+                status.className = 'status ' + type;
+                status.style.display = 'block';
+                setTimeout(() => status.style.display = 'none', 3000);
+            }
 
-            fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        isLoggedIn = true;
+            function showStatus(message, type = 'success') {
+                const status = document.getElementById('statusMessage');
+                if (!status) return;
+                status.textContent = message;
+                status.className = 'status ' + type;
+                status.style.display = 'block';
+                setTimeout(() => status.style.display = 'none', 3000);
+            }
+
+            function authFetch(path, opts = {}) {
+                opts.headers = opts.headers || {};
+                if (adminToken) {
+                    opts.headers['Authorization'] = 'Bearer ' + adminToken;
+                    console.log('Enviando token:', adminToken);
+                } else {
+                    console.log('Token vazio!');
+                }
+                return fetch(path, opts);
+            }
+
+            // Fazer authFetch global para usar em qualquer lugar
+            window.authFetch = authFetch;
+
+            window.login = function () {
+                console.log('login() called');
+                const passwordEl = document.getElementById('adminPassword');
+                if (!passwordEl) return showLoginStatus('Campo senha não encontrado', 'error');
+                const password = passwordEl.value;
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                }).then(r => r.json()).then(data => {
+                    console.log('Resposta login:', data);
+                    if (data && data.token) {
+                        adminToken = data.token;
+                        console.log('Token salvo:', adminToken);
+                        // Fazer token global
+                        window.adminToken = adminToken;
                         document.getElementById('loginContainer').style.display = 'none';
                         document.getElementById('adminPanel').style.display = 'block';
                         loadData();
                     } else {
-                        showLoginStatus('Senha incorreta!', 'error');
+                        showLoginStatus('Senha incorreta', 'error');
                     }
-                })
-                .catch(error => {
-                    showLoginStatus('Erro de conexão!', 'error');
+                }).catch(err => {
+                    console.error('login error', err);
+                    showLoginStatus('Erro de conexão', 'error');
                 });
-        }
+            };
 
-        // Logout
-        function logout() {
-            isLoggedIn = false;
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-        }
+            window.logout = function () {
+                adminToken = '';
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'none';
+                const pw = document.getElementById('adminPassword'); if (pw) pw.value = '';
+            };
 
-        // Show Login Status
-        function showLoginStatus(message, type) {
-            const status = document.getElementById('loginStatus');
-            status.textContent = message;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
-            setTimeout(() => status.style.display = 'none', 3000);
-        }
-
-        // Show Status Message
-        function showStatus(message, type = 'success') {
-            const status = document.getElementById('statusMessage');
-            status.textContent = message;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
-            setTimeout(() => status.style.display = 'none', 3000);
-        }
-
-        // Tab Management
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            // Load specific data
-            if (tabName === 'teams') loadTeams();
-            else if (tabName === 'players') loadPlayers();
-            else if (tabName === 'templates') loadTemplates();
-            else if (tabName === 'tournaments') loadTournaments();
-            else if (tabName === 'codes') loadCodes();
-        }
-
-        // Load all data
-        function loadData() {
-            loadStats();
-            loadTeams();
-            loadPlayers();
-            loadTemplates();
-            loadCodes();
-        }
-
-        // Load Statistics
-        function loadStats() {
-            fetch('/api/stats', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Novo formato de resposta direta do stats
-                    document.getElementById('statsContainer').innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-number">${data.totalUsers || 0}</div>
-                            <div class="stat-label">👥 Total Usuários</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${data.totalTeams || 0}</div>
-                            <div class="stat-label">🏆 Times Criados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${data.totalCards || 0}</div>
-                            <div class="stat-label">🎴 Total Cartas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${data.totalTemplates || 0}</div>
-                            <div class="stat-label">⚙️ Templates</div>
-                        </div>
-                    `;
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar stats:', error);
-                    document.getElementById('statsContainer').innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">👥 Total Usuários</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">🏆 Times Criados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">🎴 Total Cartas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">⚙️ Templates</div>
-                        </div>
-                    `;
-                });
-        }
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">🏆 Times Criados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">🎴 Total Cartas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">⚙️ Templates</div>
-                        </div>
-                    `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição de stats:', error);
-                    document.getElementById('statsContainer').innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-number">Erro</div>
-                        <div class="stat-label">👥 Total Usuários</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">Erro</div>
-                        <div class="stat-label">🏆 Times Criados</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">Erro</div>
-                        <div class="stat-label">🎴 Total Cartas</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">Erro</div>
-                        <div class="stat-label">⚙️ Templates</div>
-                    </div>
-                `;
-                });
-        }
-
-        // Load Teams
-        function loadTeams() {
-            fetch('/api/teams', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        const tbody = document.getElementById('teamsTable');
-                        tbody.innerHTML = data.data.map(team => `
-                        <tr>
-                            <td>${team.id}</td>
-                            <td>${team.name}</td>
-                            <td><code>${team.discord_id || team.owner_discord_id || ''}</code></td>
-                            <td>${team.username || '-'}</td>
-                            <td>${team.wins}</td>
-                            <td>${team.losses}</td>
-                            <td>${team.created_at ? new Date(team.created_at).toLocaleDateString('pt-BR') : '-'}</td>
-                            <td>
-                                <button class="btn btn-danger" onclick="deleteTeam('${team.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                    } else {
-                        document.getElementById('teamsTable').innerHTML = '<tr><td colspan="8">Nenhum time encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar times:', error);
-                    document.getElementById('teamsTable').innerHTML = '<tr><td colspan="8">Erro ao carregar times</td></tr>';
-                });
-        }
-
-        // Load Players
-        function loadPlayers() {
-            fetch('/api/players', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        const tbody = document.getElementById('playersTable');
-                        tbody.innerHTML = data.data.map(player => `
-                        <tr>
-                            <td><code>${player.discord_id}</code></td>
-                            <td>${player.name}</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>💰 ${player.purple_coins}</td>
-                            <td>
-                                <button class="btn" onclick="addCoinsToUser('${player.discord_id}')">💰</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                    } else {
-                        document.getElementById('playersTable').innerHTML = '<tr><td colspan="9">Nenhum jogador encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar jogadores:', error);
-                    document.getElementById('playersTable').innerHTML = '<tr><td colspan="9">Erro ao carregar jogadores</td></tr>';
-                });
-        }
-
-        // Load Templates
-        function loadTemplates() {
-            fetch('/api/templates', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        const tbody = document.getElementById('templatesTable');
-                        tbody.innerHTML = data.data.map(template => `
-                        <tr>
-                            <td>${template.id}</td>
-                            <td>${template.name}</td>
-                            <td>${template.position || '-'}</td>
-                            <td style="font-size: 20px;">${template.avatar || '❓'}</td>
-                            <td>${template.created_at ? new Date(template.created_at).toLocaleDateString('pt-BR') : '-'}</td>
-                            <td>
-                                <button class="btn btn-danger" onclick="deleteTemplate('${template.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                    } else {
-                        document.getElementById('templatesTable').innerHTML = '<tr><td colspan="6">Nenhum template encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar templates:', error);
-                    document.getElementById('templatesTable').innerHTML = '<tr><td colspan="6">Erro ao carregar templates</td></tr>';
-                });
-        }
-
-        // Create Template
-        function createTemplate() {
-            const name = document.getElementById('templateName').value;
-            const position = document.getElementById('templatePosition').value;
-            const avatar = document.getElementById('templateAvatar').value;
-
-            if (!name || !avatar) {
-                showStatus('Preencha nome e avatar!', 'error');
-                return;
+            function loadData() {
+                loadStats();
+                loadTeams();
+                loadPlayers();
+                loadTemplates();
+                loadTournaments();
             }
 
-            if (avatar.length > 10) {
-                showStatus('Avatar deve ter no máximo 10 caracteres!', 'error');
-                return;
+            function loadStats() {
+                authFetch('/api/stats').then(r => r.json()).then(data => {
+                    const c = document.getElementById('statsContainer');
+                    if (!c) return;
+                    c.innerHTML = '<div class="stat-card"><div class="stat-number">' + (data.totalUsers || 0) + '</div><div class="stat-label">👥 Total Usuários</div></div>' +
+                        '<div class="stat-card"><div class="stat-number">' + (data.totalTeams || 0) + '</div><div class="stat-label">🏆 Times Criados</div></div>' +
+                        '<div class="stat-card"><div class="stat-number">' + (data.totalCards || 0) + '</div><div class="stat-label">🎴 Total Cartas</div></div>' +
+                        '<div class="stat-card"><div class="stat-number">' + (data.totalTemplates || 0) + '</div><div class="stat-label">⚙️ Templates</div></div>';
+                }).catch(() => { });
             }
 
-            fetch('/api/templates', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, position, avatar })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Jogador criado com sucesso!');
-                        document.getElementById('templateName').value = '';
-                        document.getElementById('templateAvatar').value = '';
-                        document.getElementById('avatarPreview').textContent = '❓';
-                        loadTemplates();
-                        loadStats();
-                    } else {
-                        showStatus(data.message || 'Erro ao criar jogador', 'error');
-                    }
-                })
-                .catch(error => {
-                    showStatus('Erro na conexão: ' + error.message, 'error');
-                });
-        }
-
-        // Search Player by Team Name
-        function searchPlayerByTeam() {
-            const teamName = document.getElementById('teamSearchName').value;
-
-            if (!teamName) {
-                showStatus('Digite o nome do time!', 'error');
-                return;
+            function loadTeams() {
+                authFetch('/api/teams').then(r => r.json()).then(data => {
+                    const tbody = document.getElementById('teamsTable'); if (!tbody) return;
+                    if (!data || !data.data) { tbody.innerHTML = '<tr><td colspan="8">Nenhum time</td></tr>'; return; }
+                    tbody.innerHTML = data.data.map(t => '<tr><td>' + t.id + '</td><td>' + (t.name || '') + '</td><td><code>' + (t.discord_id || t.owner_discord_id || '') + '</code></td><td>' + (t.username || '-') + '</td><td>' + (t.wins || 0) + '</td><td>' + (t.losses || 0) + '</td><td>' + (t.created_at || '-') + '</td><td><button class="btn btn-danger" onclick="deleteTeam(\'' + t.id + '\')">🗑️</button></td></tr>').join('');
+                }).catch(e => console.error(e));
             }
 
-            fetch(`/api/teams/search?name=${encodeURIComponent(teamName)}`)
-                .then(response => response.json())
-                .then(data => {
-                    const resultDiv = document.getElementById('teamSearchResult');
-                    if (data.success && data.data) {
-                        const team = data.data;
-                        resultDiv.innerHTML = `
-                        <div class="card" style="margin-top: 15px;">
-                            <h4>🏆 ${team.name}</h4>
-                            <p><strong>Proprietário:</strong> <code>${team.owner_discord_id}</code></p>
-                            <p><strong>Username:</strong> ${team.username || 'N/A'}</p>
-                            <p><strong>Vitórias:</strong> 🏆 ${team.wins}</p>
-                            <p><strong>Derrotas:</strong> ❌ ${team.losses}</p>
-                            <p><strong>Criado em:</strong> ${new Date(team.created_at).toLocaleDateString('pt-BR')}</p>
-                            <button class="btn" onclick="loadPlayerCards('${team.owner_discord_id}')">📊 Ver Cartas do Jogador</button>
-                        </div>
-                    `;
-                    } else {
-                        resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Time não encontrado</p></div>`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na busca:', error);
-                    document.getElementById('teamSearchResult').innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Erro na busca</p></div>`;
-                });
-        }
+            function loadPlayers() {
+                authFetch('/api/players').then(r => r.json()).then(data => {
+                    const tbody = document.getElementById('playersTable'); if (!tbody) return;
+                    if (!data || !data.data) { tbody.innerHTML = '<tr><td colspan="9">Nenhum jogador</td></tr>'; return; }
+                    tbody.innerHTML = data.data.map(p => '<tr><td><code>' + (p.discord_id || '') + '</code></td><td>' + (p.name || '') + '</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>💰 ' + (p.purple_coins || 0) + '</td><td><button class="btn" onclick="addCoinsToUser(\'' + (p.discord_id || '') + '\')">💰</button></td></tr>').join('');
+                }).catch(e => console.error(e));
+            }
 
-        // Load Player Cards
-        function loadPlayerCards(discordId) {
-            fetch(`/api/user/${discordId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const resultDiv = document.getElementById('teamSearchResult');
-                    if (data.success) {
-                        resultDiv.innerHTML += `
-                        <div class="card" style="margin-top: 10px; background: #d4edda; border-left-color: #28a745;">
-                            <h4>🎴 Cartas do Jogador: ${data.user.name || data.user.username || 'Usuário Desconhecido'}</h4>
-                            <p><strong>Discord ID:</strong> <code>${data.user.discord_id}</code></p>
-                            <p><strong>Purple Coins:</strong> 💰 ${data.user.purple_coins}</p>
-                            <p><strong>Total de Cartas:</strong> 🎴 ${data.cards.total}</p>
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;">
-                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px;">
-                                    <strong>Prime</strong><br>💎 ${data.cards.prime}
-                                </div>
-                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px;">
-                                    <strong>GOAT</strong><br>🐐 ${data.cards.goat}
-                                </div>
-                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px;">
-                                    <strong>Médio</strong><br>📊 ${data.cards.medio}
-                                </div>
-                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px;">
-                                    <strong>Bagre</strong><br>🐟 ${data.cards.bagre}
-                                </div>
+            function loadTemplates() {
+                authFetch('/api/templates').then(r => r.json()).then(data => {
+                    const tbody = document.getElementById('templatesTable'); if (!tbody) return;
+                    if (!data || !data.data) { tbody.innerHTML = '<tr><td colspan="6">Nenhum template</td></tr>'; return; }
+                    tbody.innerHTML = data.data.map(t => '<tr><td>' + t.id + '</td><td>' + (t.name || '') + '</td><td>' + (t.position || '-') + '</td><td style="font-size:20px;">' + (t.avatar || '❓') + '</td><td>' + (t.created_at || '-') + '</td><td><button class="btn btn-primary btn-sm" onclick="editTemplate(\'' + t.id + '\')">✏️ Editar</button> <button class="btn btn-danger btn-sm" onclick="deleteTemplate(\'' + t.id + '\')">🗑️</button></td></tr>').join('');
+                }).catch(e => console.error(e));
+            }
+
+            function loadTournaments() {
+                authFetch('/api/tournaments').then(r => r.json()).then(data => {
+                    const tbody = document.getElementById('tournamentsTable'); if (!tbody) return;
+                    if (!data || !data.tournaments) { tbody.innerHTML = '<tr><td colspan="9">Nenhum torneio encontrado</td></tr>'; return; }
+                    tbody.innerHTML = data.tournaments.map(t => '<tr><td>' + t.id + '</td><td>' + (t.name || '') + '</td><td>' + (t.date ? new Date(t.date).toLocaleDateString('pt-BR') : '') + '</td><td>' + (t.time || '') + '</td><td>' + (t.format || '') + '</td><td>' + (t.max_players || '') + '</td><td>' + ((t.registered_teams || 0) + '/' + (t.max_players || '')) + '</td><td><span class="status">' + (t.status || '') + '</span></td><td><button class="btn btn-danger" onclick="deleteTournament(\'' + t.id + '\')">🗑️</button></td></tr>').join('');
+                }).catch(e => console.error(e));
+            }
+
+            // Expose helper actions globally (used by onclicks in HTML)
+            window.deleteTeam = function (id) { if (!confirm('Tem certeza?')) return; authFetch('/api/teams/' + id, { method: 'DELETE' }).then(() => loadTeams()).catch(e => console.error(e)); };
+            window.deleteTemplate = function (id) { if (!confirm('Tem certeza?')) return; authFetch('/api/templates/' + id, { method: 'DELETE' }).then(() => loadTemplates()).catch(e => console.error(e)); };
+            window.deleteCode = function (id) { if (!confirm('Tem certeza?')) return; authFetch('/api/codes/' + encodeURIComponent(id), { method: 'DELETE' }).then(() => loadCodes()).catch(e => console.error(e)); };
+            window.deleteTournament = function (id) { if (!confirm('Tem certeza?')) return; authFetch('/api/tournaments/' + id, { method: 'DELETE' }).then(() => loadTournaments()).catch(e => console.error(e)); };
+            window.addCoinsToUser = function (discordId) { const amount = prompt('Quantas coins?'); if (!amount) return; authFetch('/api/coins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ discordId, amount: parseInt(amount) }) }).then(() => loadPlayers()).catch(e => console.error(e)); };
+
+            // Search user function
+            window.searchUser = function () {
+                const discordId = document.getElementById('searchUserId').value;
+
+                if (!discordId) {
+                    showStatus('Digite um Discord ID!', 'error');
+                    return;
+                }
+
+                fetch(`/api/user/${discordId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultDiv = document.getElementById('userSearchResult');
+                        if (data.success) {
+                            resultDiv.innerHTML = `
+                            <div class="card" style="margin-top: 15px;">
+                                <h4>👤 ${data.user.username}</h4>
+                                <p><strong>Discord ID:</strong> <code>${data.user.discord_id}</code></p>
+                                <p><strong>Purple Coins:</strong> 💰 ${data.user.purple_coins}</p>
+                                <p><strong>Total de Cartas:</strong> 🎴 ${data.cards.total}</p>
+                                <p><strong>Prime:</strong> ${data.cards.prime} | <strong>GOAT:</strong> ${data.cards.goat} |
+                                    <strong>Médio:</strong> ${data.cards.medio} | <strong>Bagre:</strong> ${data.cards.bagre}
+                                </p>
                             </div>
-                        </div>
-                    `;
-                    } else {
-                        resultDiv.innerHTML += `<div class="card" style="margin-top: 10px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Erro ao carregar cartas do jogador</p></div>`;
-                    }
-                });
-        }
-
-        // Load All Teams
-        function loadAllTeams() {
-            fetch('/api/teams')
-                .then(response => response.json())
-                .then(data => {
-                    const resultDiv = document.getElementById('allTeamsList');
-                    if (data.success && data.data.length > 0) {
-                        let teamsHtml = `
-                        <div class="card" style="margin-top: 15px;">
-                            <h4>📋 Todos os Times (${data.data.length})</h4>
-                            <div style="display: grid; gap: 10px; margin-top: 10px;">
                         `;
-
-                        data.data.forEach(team => {
-                            teamsHtml += `
-                                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; border-left: 4px solid #007bff;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <strong>🏆 ${team.name}</strong><br>
-                                            <small>👤 ${team.username || 'N/A'} (${team.owner_discord_id})</small><br>
-                                            <small>📊 ${team.wins}V - ${team.losses}D - Criado: ${new Date(team.created_at).toLocaleDateString('pt-BR')}</small>
-                                        </div>
-                                        <button class="btn" onclick="loadPlayerCards('${team.owner_discord_id}')" style="margin: 0;">
-                                            📊 Ver Cartas
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-
-                        teamsHtml += '</div></div>';
-                        resultDiv.innerHTML = teamsHtml;
-                    } else {
-                        resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Nenhum time encontrado</p></div>`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar times:', error);
-                    document.getElementById('allTeamsList').innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Erro ao carregar times</p></div>`;
-                });
-        }
-
-        // Delete Template
-        function deleteTemplate(id) {
-            if (!confirm('Tem certeza que deseja excluir este jogador?')) return;
-
-            fetch(`/api/templates/${id}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Jogador excluído com sucesso!');
-                        loadTemplates();
-                        loadStats();
-                    } else {
-                        showStatus(data.error, 'error');
-                    }
-                });
-        }
-
-        // Delete Team
-        function deleteTeam(id) {
-            if (!confirm('Tem certeza que deseja excluir este time?')) return;
-
-            fetch(`/api/teams/${id}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Time excluído com sucesso!');
-                        loadTeams();
-                        loadStats();
-                    } else {
-                        showStatus(data.error, 'error');
-                    }
-                });
-        }
-
-        // Add Coins
-        function addCoins() {
-            const discordId = document.getElementById('coinDiscordId').value;
-            const amount = parseInt(document.getElementById('coinAmount').value);
-
-            if (!discordId || !amount) {
-                showStatus('Preencha Discord ID e quantidade!', 'error');
-                return;
+                        } else {
+                            resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
+                            <p>❌ Usuário não encontrado</p>
+                        </div>`;
+                        }
+                    });
             }
 
-            fetch('/api/coins/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ discord_id: discordId, amount })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus(`Moedas adicionadas! Saldo atual: ${data.currentBalance}`);
-                        document.getElementById('coinDiscordId').value = '';
-                        document.getElementById('coinAmount').value = '';
+            // Ver detalhes do código
+            window.viewCodeDetails = function (codeId) {
+                authFetch('/api/codes/' + codeId).then(r => r.json()).then(data => {
+                    if (data && data.code) {
+                        const c = data.code;
+                        const details = '📋 DETALHES DO CÓDIGO\\n\\n🎫 Código: ' + c.code + '\\n💰 Valor: ' + c.coin_amount + ' Purple Coins\\n📊 Status: ' + (c.is_active ? 'Ativo' : 'Inativo') + '\\n📈 Usos: ' + c.uses_count + '/' + c.max_uses + '\\n⏰ Expira em: ' + c.expiry_hours + 'h\\n📅 Criado: ' + new Date(c.created_at).toLocaleString('pt-BR') + (c.used_by ? '\\n👤 Usado por: ' + c.used_by : '');
+                        alert(details);
                     } else {
-                        showStatus(data.error, 'error');
+                        alert('❌ Erro ao carregar detalhes do código');
                     }
-                });
-        }
+                }).catch(e => { console.error(e); alert('❌ Erro de conexão'); });
+            };
 
-        // Preview Avatar
-        function previewAvatar() {
-            const avatarInput = document.getElementById('templateAvatar');
-            const preview = document.getElementById('avatarPreview');
-            preview.textContent = avatarInput.value || '❓';
-        }
+            // Editar template (nome e avatar)
+            window.editTemplate = function (templateId) {
+                authFetch('/api/templates/' + templateId).then(r => r.json()).then(data => {
+                    if (data && data.template) {
+                        const t = data.template;
+                        const newName = prompt('✏️ Novo nome do jogador:', t.name);
+                        if (newName && newName !== t.name) {
+                            const newAvatar = prompt('🎭 Novo avatar (emoji):', t.avatar);
+                            if (newAvatar !== null) {
+                                authFetch('/api/templates/' + templateId, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ name: newName, avatar: newAvatar || t.avatar })
+                                }).then(() => {
+                                    alert('✅ Template atualizado com sucesso!');
+                                    loadTemplates();
+                                }).catch(e => { console.error(e); alert('❌ Erro ao atualizar template'); });
+                            }
+                        }
+                    } else {
+                        alert('❌ Erro ao carregar template');
+                    }
+                }).catch(e => { console.error(e); alert('❌ Erro de conexão'); });
+            };
 
-        // Codes Management Functions
+            // Wire Enter key for login
+            document.addEventListener('DOMContentLoaded', function () {
+                const pw = document.getElementById('adminPassword'); if (pw) pw.addEventListener('keypress', function (e) { if (e.key === 'Enter') window.login(); });
+            });
+
+            // Small initial state: ensure admin panel hidden
+            document.addEventListener('DOMContentLoaded', function () {
+                const panel = document.getElementById('adminPanel'); if (panel) panel.style.display = 'none';
+            });
+        })();
+
+        // Code creation function
         function createCode() {
             const value = parseInt(document.getElementById('codeValue').value);
             const expiresIn = parseInt(document.getElementById('codeExpires').value);
@@ -1220,9 +830,40 @@
                 });
         }
 
+        // Load codes function
+        function loadCodes() {
+            authFetch('/api/codes')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('codesTable');
+                    if (data.success && data.codes.length > 0) {
+                        tbody.innerHTML = data.codes.map(code => `
+                        <tr>
+                            <td>${code.id}</td>
+                            <td><code>${code.code}</code></td>
+                            <td>${code.value}</td>
+                            <td>${code.is_active ? '<span style="color: #28a745;">✅ Ativo</span>' : '<span style="color: #dc3545;">❌ Inativo</span>'}</td>
+                            <td>${code.current_uses}/${code.max_uses}</td>
+                            <td>${new Date(code.expires_at).toLocaleString('pt-BR')}</td>
+                            <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deleteCode('${code.code}')">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="8">📦 Nenhum código encontrado</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar códigos:', error);
+                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">❌ Erro ao carregar códigos</td></tr>';
+                });
+        }
+
         function verifyCode() {
             const code = document.getElementById('verifyCodeInput').value.trim();
-            
+
             if (!code) {
                 showStatus('Digite um código para verificar!', 'error');
                 return;
@@ -1236,67 +877,30 @@
                         const codeData = data.code;
                         const statusColor = codeData.is_active ? '#28a745' : '#dc3545';
                         const statusText = codeData.is_active ? '✅ Ativo' : '❌ Inativo';
-                        
-                        resultDiv.innerHTML = `
-                            <div class="card" style="margin-top: 15px; border-left-color: ${statusColor};">
-                                <h4>🎫 ${codeData.code}</h4>
-                                <p><strong>Valor:</strong> ${codeData.value} Purple Coins</p>
-                                <p><strong>Status:</strong> ${statusText}</p>
-                                <p><strong>Usos:</strong> ${codeData.current_uses}/${codeData.max_uses}</p>
-                                <p><strong>Expira em:</strong> ${new Date(codeData.expires_at).toLocaleString('pt-BR')}</p>
-                                <p><strong>Criado em:</strong> ${new Date(codeData.created_at).toLocaleString('pt-BR')}</p>
-                            </div>
-                        `;
+
+                        resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; border-left-color: ${statusColor};">
+                        <h4>🎫 ${codeData.code}</h4>
+                        <p><strong>Valor:</strong> ${codeData.value} Purple Coins</p>
+                        <p><strong>Status:</strong> ${statusText}</p>
+                        <p><strong>Usos:</strong> ${codeData.current_uses}/${codeData.max_uses}</p>
+                        <p><strong>Expira em:</strong> ${new Date(codeData.expires_at).toLocaleString('pt-BR')}</p>
+                        <p><strong>Criado em:</strong> ${new Date(codeData.created_at).toLocaleString('pt-BR')}</p>
+                    </div>`;
                     } else {
-                        resultDiv.innerHTML = `
-                            <div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
-                                <p>❌ ${data.error}</p>
-                            </div>
-                        `;
+                        resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
+                        <p>❌ ${data.error}</p>
+                    </div>`;
                     }
                 })
                 .catch(error => {
                     console.error('Erro ao verificar código:', error);
-                    document.getElementById('codeVerifyResult').innerHTML = `
-                        <div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
-                            <p>❌ Erro ao verificar código</p>
-                        </div>
-                    `;
+                    document.getElementById('codeVerifyResult').innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;">
+                    <p>❌ Erro ao verificar código</p>
+                </div>`;
                 });
         }
 
-        function loadCodes() {
-            fetch('/api/codes', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('codesTable');
-                    if (data.success && data.codes.length > 0) {
-                        tbody.innerHTML = data.codes.map(code => `
-                            <tr>
-                                <td>${code.id}</td>
-                                <td><code>${code.code}</code></td>
-                                <td>${code.value}</td>
-                                <td>${code.is_active ? '<span style="color: #28a745;">✅ Ativo</span>' : '<span style="color: #dc3545;">❌ Inativo</span>'}</td>
-                                <td>${code.current_uses}/${code.max_uses}</td>
-                                <td>${new Date(code.expires_at).toLocaleString('pt-BR')}</td>
-                                <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
-                                <td>
-                                    <button class="btn btn-danger" onclick="deleteCode('${code.code}')">🗑️</button>
-                                </td>
-                            </tr>
-                        `).join('');
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="8">📦 Nenhum código encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar códigos:', error);
-                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">❌ Erro ao carregar códigos</td></tr>';
-                });
-        }
-
+        // Delete code function
         function deleteCode(code) {
             if (!confirm(`Tem certeza que deseja excluir o código ${code}?`)) return;
 
@@ -1315,77 +919,8 @@
                     showStatus('Erro ao excluir código', 'error');
                 });
         }
-            }
 
-            fetch('/api/coins', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ discordId, amount })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus(`${amount} Purple Coins adicionadas com sucesso!`);
-                        document.getElementById('coinDiscordId').value = '';
-                        document.getElementById('coinAmount').value = '';
-                        loadPlayers();
-                    } else {
-                        showStatus(data.error, 'error');
-                    }
-                });
-        }
-
-        // Search User
-        function searchUser() {
-            const discordId = document.getElementById('searchUserId').value;
-
-            if (!discordId) {
-                showStatus('Digite um Discord ID!', 'error');
-                return;
-            }
-
-            fetch(`/api/user/${discordId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const resultDiv = document.getElementById('userSearchResult');
-                    if (data.success) {
-                        resultDiv.innerHTML = `
-                        <div class="card" style="margin-top: 15px;">
-                            <h4>👤 ${data.user.username}</h4>
-                            <p><strong>Discord ID:</strong> <code>${data.user.discord_id}</code></p>
-                            <p><strong>Purple Coins:</strong> 💰 ${data.user.purple_coins}</p>
-                            <p><strong>Total de Cartas:</strong> 🎴 ${data.cards.total}</p>
-                            <p><strong>Prime:</strong> ${data.cards.prime} | <strong>GOAT:</strong> ${data.cards.goat} | <strong>Médio:</strong> ${data.cards.medio} | <strong>Bagre:</strong> ${data.cards.bagre}</p>
-                        </div>
-                    `;
-                    } else {
-                        resultDiv.innerHTML = `<div class="card" style="margin-top: 15px; background: #f8d7da; border-left-color: #dc3545;"><p>❌ Usuário não encontrado</p></div>`;
-                    }
-                });
-        }
-
-        // Add coins to specific user
-        function addCoinsToUser(discordId) {
-            const amount = prompt('Quantas Purple Coins adicionar?');
-            if (!amount || isNaN(amount)) return;
-
-            fetch('/api/coins', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ discordId, amount: parseInt(amount) })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus(`${amount} Purple Coins adicionadas!`);
-                        loadPlayers();
-                    } else {
-                        showStatus(data.error, 'error');
-                    }
-                });
-        }
-
-        // Tournament Functions
+        // Tournament functions
         function loadTournaments() {
             fetch('/api/tournaments')
                 .then(response => response.json())
@@ -1398,17 +933,17 @@
                             <td>${new Date(tournament.date).toLocaleDateString('pt-BR')}</td>
                             <td>${tournament.time}</td>
                             <td>${tournament.format}</td>
-                            <td>${tournament.registered_teams || 0}/${tournament.max_players}</td>
+                            <td>${(tournament.registered_teams || 0)}/${tournament.max_players}</td>
                             <td><span class="status ${tournament.status}">${tournament.status}</span></td>
                             <td>
                                 <button class="btn btn-info btn-sm" onclick="viewTournamentRegistrations(${tournament.id})">
                                     👥 Ver Inscritos
-                                </button>
+                            </button>
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-sm" onclick="deleteTournament(${tournament.id})">
                                     🗑️ Deletar
-                                </button>
+                            </button>
                             </td>
                         </tr>
                     `).join('');
@@ -1422,99 +957,7 @@
                 });
         }
 
-        // Create Tournament
-        document.getElementById('createTournamentForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const tournamentData = {
-                name: document.getElementById('tournamentName').value,
-                date: document.getElementById('tournamentDate').value,
-                time: document.getElementById('tournamentTime').value,
-                format: document.getElementById('tournamentFormat').value,
-                max_players: parseInt(document.getElementById('tournamentMaxPlayers').value),
-                prize_1st: document.getElementById('tournamentPrize1st').value,
-                prize_2nd: document.getElementById('tournamentPrize2nd').value,
-                prize_3rd: document.getElementById('tournamentPrize3rd').value
-            };
-
-            fetch('/api/tournaments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tournamentData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Torneio criado com sucesso!', 'success');
-                        document.getElementById('createTournamentForm').reset();
-                        loadTournaments();
-                    } else {
-                        showStatus(data.message || 'Erro ao criar torneio', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao criar torneio:', error);
-                    showStatus('Erro ao criar torneio', 'error');
-                });
-        });
-
-        // Delete Tournament
-        function deleteTournament(id) {
-            if (confirm('Tem certeza que deseja deletar este torneio?')) {
-                fetch(`/api/tournaments/${id}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showStatus('Torneio deletado com sucesso!', 'success');
-                            loadTournaments();
-                        } else {
-                            showStatus(data.message || 'Erro ao deletar torneio', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro ao deletar torneio:', error);
-                        showStatus('Erro ao deletar torneio', 'error');
-                    });
-            }
-        }
-
-        // View Tournament Registrations
-        function viewTournamentRegistrations(tournamentId) {
-            fetch(`/api/tournaments/${tournamentId}/registrations`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        let message = `Inscritos no Torneio:\n\n`;
-                        if (data.registrations && data.registrations.length > 0) {
-                            data.registrations.forEach((reg, index) => {
-                                message += `${index + 1}. ${reg.team_name} (${reg.owner_username || reg.owner_id})\n`;
-                            });
-                        } else {
-                            message += 'Nenhum time inscrito ainda.';
-                        }
-                        alert(message);
-                    } else {
-                        showStatus(data.message || 'Erro ao buscar inscrições', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar inscrições:', error);
-                    showStatus('Erro ao buscar inscrições', 'error');
-                });
-        }
-
-        // Update loadData function
-        function loadData() {
-            loadStats();
-            loadTeams();
-            loadPlayers();
-            loadTemplates();
-            loadTournaments();
-        }
-
-        // Create Tournament
+        // Create tournament function
         function createTournament() {
             const name = document.getElementById('tournamentName').value;
             const date = document.getElementById('tournamentDate').value;
@@ -1562,72 +1005,10 @@
                 });
         }
 
-        // Load Tournaments
-        function loadTournaments() {
-            fetch('/api/tournaments')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.tournaments) {
-                        const tbody = document.getElementById('tournamentsTable');
-                        tbody.innerHTML = data.tournaments.map(tournament => `
-                        <tr>
-                            <td>${tournament.id}</td>
-                            <td>${tournament.name}</td>
-                            <td>${new Date(tournament.date).toLocaleDateString('pt-BR')}</td>
-                            <td>${tournament.time}</td>
-                            <td>${tournament.format}</td>
-                            <td>${tournament.max_players}</td>
-                            <td>${tournament.registered_teams || 0}/${tournament.max_players}</td>
-                            <td>
-                                <span style="color: ${tournament.status === 'upcoming' ? '#f39c12' : tournament.status === 'active' ? '#27ae60' : '#e74c3c'}">
-                                    ${tournament.status === 'upcoming' ? '🕐 Aguardando' : tournament.status === 'active' ? '🔴 Ativo' : '✅ Finalizado'}
-                                </span>
-                            </td>
-                            <td>
-                                ${tournament.status === 'upcoming' ?
-                                `<button class="btn" onclick="startTournament('${tournament.id}')">🚀 Iniciar</button>` :
-                                ''}
-                                <button class="btn btn-danger" onclick="deleteTournament('${tournament.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                    } else {
-                        document.getElementById('tournamentsTable').innerHTML = '<tr><td colspan="9">Nenhum torneio encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar torneios:', error);
-                    document.getElementById('tournamentsTable').innerHTML = '<tr><td colspan="9">Erro ao carregar torneios</td></tr>';
-                });
-        }
-
-        // Start Tournament
-        function startTournament(id) {
-            if (confirm('Tem certeza que deseja iniciar este torneio?')) {
-                fetch(`/api/tournaments/${id}/start`, {
-                    method: 'POST'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showStatus('Torneio iniciado com sucesso!');
-                            loadTournaments();
-                        } else {
-                            showStatus(data.message || 'Erro ao iniciar torneio', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        showStatus('Erro na conexão: ' + error.message, 'error');
-                    });
-            }
-        }
-
-        // Delete Tournament
+        // Delete tournament function
         function deleteTournament(id) {
             if (confirm('Tem certeza que deseja deletar este torneio?')) {
-                fetch(`/api/tournaments/${id}`, {
-                    method: 'DELETE'
-                })
+                fetch(`/api/tournaments/${id}`, { method: 'DELETE' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -1643,150 +1024,73 @@
             }
         }
 
-        // Update showTab function
-        function showTab(tabName) {
+        // View tournament registrations function
+        function viewTournamentRegistrations(tournamentId) {
+            fetch(`/api/tournaments/${tournamentId}/registrations`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let message = `Inscritos no Torneio:\n\n`;
+                        if (data.registrations && data.registrations.length > 0) {
+                            data.registrations.forEach((reg, index) => {
+                                message += `${index + 1}. ${reg.team_name} (${reg.owner_username || reg.owner_id})\n`;
+                            });
+                        } else {
+                            message += 'Nenhum time inscrito ainda.';
+                        }
+                        alert(message);
+                    } else {
+                        showStatus(data.message || 'Erro ao buscar inscrições', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar inscrições:', error);
+                    showStatus('Erro ao buscar inscrições', 'error');
+                });
+        }
+
+        // Start tournament function
+        function startTournament(id) {
+            if (confirm('Tem certeza que deseja iniciar este torneio?')) {
+                fetch(`/api/tournaments/${id}/start`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showStatus('Torneio iniciado com sucesso!');
+                            loadTournaments();
+                        } else {
+                            showStatus(data.message || 'Erro ao iniciar torneio', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showStatus('Erro na conexão: ' + error.message, 'error');
+                    });
+            }
+        }
+
+        // Updated loadData function
+        function loadData() {
+            loadStats();
+            loadTeams();
+            loadPlayers();
+            loadTemplates();
+            loadTournaments();
+        }
+
+        // Updated showTab function
+        window.showTab = function (tabName) {
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-
             document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
             document.getElementById(tabName).classList.add('active');
-
             if (tabName === 'teams') loadTeams();
             else if (tabName === 'players') loadPlayers();
             else if (tabName === 'templates') loadTemplates();
             else if (tabName === 'tournaments') loadTournaments();
-        }
-
-        // Load Codes
-        function loadCodes() {
-            fetch('/api/codes', {
-                headers: { 'Authorization': 'Bearer admin123' }
-            })
-                .then(response => response.json())
-                .then(codes => {
-                    const tbody = document.getElementById('codesTable');
-                    if (codes && codes.length > 0) {
-                        tbody.innerHTML = codes.map(code => {
-                            const isExpired = code.expiry_hours && 
-                                new Date(code.created_at).getTime() + (code.expiry_hours * 60 * 60 * 1000) < Date.now();
-                            const isExhausted = code.uses_count >= code.max_uses;
-                            const status = !code.is_active ? 'INATIVO' : 
-                                         isExpired ? 'EXPIRADO' : 
-                                         isExhausted ? 'ESGOTADO' : 'ATIVO';
-                            const statusClass = status === 'ATIVO' ? 'active' : 'expired';
-                            
-                            return `
-                            <tr>
-                                <td>${code.id}</td>
-                                <td><code>${code.code}</code></td>
-                                <td>💰 ${code.coin_amount}</td>
-                                <td><span class="code-status ${statusClass}">${status}</span></td>
-                                <td>${code.uses_count}/${code.max_uses}</td>
-                                <td>${code.expiry_hours}h</td>
-                                <td>${new Date(code.created_at).toLocaleString('pt-BR')}</td>
-                                <td>
-                                    <button class="btn btn-danger" onclick="deleteCode('${code.id}')">🗑️</button>
-                                </td>
-                            </tr>
-                        `;}).join('');
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="8">Nenhum código encontrado</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar códigos:', error);
-                    document.getElementById('codesTable').innerHTML = '<tr><td colspan="8">Erro ao carregar códigos</td></tr>';
-                });
-        }
-
-        // Create Code
-        function createCode() {
-            const value = parseInt(document.getElementById('codeValue').value);
-            const expires = parseInt(document.getElementById('codeExpires').value);
-            const maxUses = parseInt(document.getElementById('codeMaxUses').value);
-
-            if (!value || !expires || !maxUses) {
-                showStatus('Preencha todos os campos!', 'error');
-                return;
-            }
-
-            fetch('/api/codes', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer admin123'
-                },
-                body: JSON.stringify({
-                    coin_amount: value,
-                    expiry_hours: expires,
-                    max_uses: maxUses
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.id) {
-                        showStatus(`Código criado: ${data.code}`, 'success');
-                        document.getElementById('codeValue').value = '';
-                        document.getElementById('codeExpires').value = '';
-                        document.getElementById('codeMaxUses').value = '';
-                        loadCodes();
-                    } else {
-                        showStatus(data.error || 'Erro ao criar código', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao criar código:', error);
-                    showStatus('Erro ao criar código', 'error');
-                });
-        }
-                    }
-                })
-                .catch(error => {
-                    showStatus('Erro na conexão: ' + error.message, 'error');
-                });
-        }
-
-        // Delete Code
-        function deleteCode(id) {
-            if (!confirm('Tem certeza que deseja excluir este código?')) return;
-
-            fetch('/api/codes', { 
-                method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer admin123'
-                },
-                body: JSON.stringify({ id })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        showStatus('Código excluído com sucesso!', 'success');
-                        loadCodes();
-                    } else {
-                        showStatus(data.error || 'Erro ao excluir código', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao excluir código:', error);
-                    showStatus('Erro ao excluir código', 'error');
-                });
-        }
-                .then(data => {
-                    if (data.success) {
-                        showStatus('Código excluído com sucesso!');
-                        loadCodes();
-                    } else {
-                        showStatus(data.message || 'Erro ao excluir código', 'error');
-                    }
-                })
-                .catch(error => {
-                    showStatus('Erro na conexão: ' + error.message, 'error');
-                });
         }
 
         // Enter key for login

@@ -14,18 +14,12 @@ module.exports = async function handler(req, res) {
 
     try {
         const { password } = req.body;
-        const adminPassword = 'admin123'; // Senha fixa para simplicidade
-
-        console.log('Tentativa de login:', {
-            password_received: password ? '***' : 'empty',
-            expected: 'admin123'
-        });
+        const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
         if (password === adminPassword) {
-            console.log('Login bem-sucedido!');
-            return res.status(200).json({ success: true, message: 'Login realizado com sucesso' });
+            // Retorna o token simples, sem "Bearer" (será adicionado no frontend)
+            return res.status(200).json({ success: true, token: adminPassword });
         } else {
-            console.log('Senha incorreta');
             return res.status(200).json({ success: false, error: 'Senha incorreta' });
         }
     } catch (error) {

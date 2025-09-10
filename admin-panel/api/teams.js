@@ -59,33 +59,27 @@ module.exports = async function handler(req, res) {
                 const orderBy = columnNames.includes('created_at') ? 'created_at DESC' :
                     columnNames.includes('id') ? 'id' : '1';
 
-                // Get teams with player information
-                const [rows] = await connection.execute(`
+                const query = `
                     SELECT 
                         t.id,
-                        t.name as team_name,
+                        t.name AS team_name,
                         t.owner_discord_id,
-                        t.owner_username,
-                        t.discord_user,
                         t.wins,
                         t.losses,
                         t.draws,
-                        t.points,
+                        (t.wins * 3 + t.draws) AS points,
                         t.created_at,
-                        t.updated_at,
-                        p.username as player_username,
-                        p.purple_coins,
-                        COUNT(uc.id) as total_cards
+                        t.updated_at
                     FROM teams t
                     LEFT JOIN players p ON t.owner_discord_id = p.discord_id
-                    LEFT JOIN user_cards uc ON p.discord_id = uc.discord_id
-                    GROUP BY t.id, t.name, t.owner_discord_id, t.owner_username, t.discord_user,
-                             t.wins, t.losses, t.draws, t.points, t.created_at, t.updated_at,
-                             p.username, p.purple_coins
-                    ORDER BY t.points DESC, t.wins DESC, t.created_at DESC
-                `);
+                    GROUP BY t.id, t.name, t.owner_discord_id,
+                             t.wins, t.losses, t.draws, t.created_at, t.updated_at
+                    ORDER BY points DESC, t.wins DESC, t.created_at DESC`;
 
-                return res.status(200).json(rows);
+                // Get teams with player information
+                const [teams] = await connection.execute(query);
+
+                return res.status(200).json(teams);
 
             } catch (error) {
                 console.error('Error fetching teams:', error);

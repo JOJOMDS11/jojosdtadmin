@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 let connection = null;
@@ -68,6 +69,14 @@ const connectionWrapper = {
             connection = null;
         }
     }
+};
+
+// Adiciona logs para depuração de queries SQL
+const originalExecute = connectionWrapper.execute;
+connectionWrapper.execute = async function (query, params) {
+    console.log('Executando query:', query);
+    console.log('Parâmetros:', params);
+    return originalExecute.call(this, query, params);
 };
 
 module.exports = connectionWrapper;

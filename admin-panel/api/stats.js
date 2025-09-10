@@ -1,5 +1,7 @@
 const connection = require('./connection');
 
+const calculatePoints = (wins, draws) => (wins * 3 + draws);
+
 module.exports = async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,9 +16,10 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Método não permitido' });
     }
 
-    // Verificar autenticação simples (opcional para stats)
+    // Verificar autenticação simples
     const adminKey = req.headers.authorization;
-    if (adminKey && adminKey !== 'Bearer admin123') {
+    const expected = `Bearer ${process.env.ADMIN_PASSWORD || 'admin123'}`;
+    if (adminKey !== expected) {
         return res.status(401).json({ error: 'Não autorizado' });
     }
 
@@ -136,10 +139,11 @@ module.exports = async function handler(req, res) {
         try {
             // Recent activity
             if (tableNames.includes('user_cards')) {
+                // usar created_at (coluna real) em vez de obtained_at
                 const [recentActivity] = await connection.execute(`
                     SELECT COUNT(*) as count 
                     FROM user_cards 
-                    WHERE obtained_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
                 `);
                 stats.cardsLast24h = recentActivity[0].count;
             } else {
